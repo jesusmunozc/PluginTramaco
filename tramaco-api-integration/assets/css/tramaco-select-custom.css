@@ -1,0 +1,213 @@
+/* ========================================
+   TRAMACO - SELECT PERSONALIZADO
+   Solución definitiva para dropdowns
+======================================== */
+
+/* Ocultar el select nativo */
+.tramaco-custom-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.tramaco-custom-select-wrapper select {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Contenedor del select personalizado */
+.tramaco-custom-select {
+  position: relative;
+  width: 100%;
+  cursor: pointer;
+  user-select: none;
+  display: block;
+}
+
+/* Asegurar ancho completo en form-group */
+.form-group .tramaco-custom-select-wrapper,
+.form-group .tramaco-custom-select {
+  width: 100%;
+  display: block;
+}
+
+/* Botón del select (lo que se ve cerrado) */
+.tramaco-custom-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #d4d8d4;
+  border-radius: 10px;
+  background: white;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d2d2d;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  min-height: 52px;
+}
+
+.tramaco-custom-select-trigger:hover {
+  border-color: #6b7547;
+}
+
+.tramaco-custom-select.open .tramaco-custom-select-trigger {
+  border-color: #6b7547;
+  box-shadow: 0 0 0 4px rgba(107, 117, 71, 0.15);
+}
+
+/* Texto del select */
+.tramaco-custom-select-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  color: #2d2d2d;
+}
+
+.tramaco-custom-select-text.placeholder {
+  color: #888;
+  font-weight: 500;
+}
+
+/* Flecha del select */
+.tramaco-custom-select-arrow {
+  width: 24px;
+  height: 24px;
+  margin-left: 12px;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.tramaco-custom-select.open .tramaco-custom-select-arrow {
+  transform: rotate(180deg);
+}
+
+.tramaco-custom-select-arrow svg {
+  width: 100%;
+  height: 100%;
+  stroke: #2d2d2d;
+  stroke-width: 2;
+}
+
+/* Lista de opciones (dropdown) */
+.tramaco-custom-select-options {
+  position: fixed;
+  background: white;
+  border: 2px solid #6b7547;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  max-height: 280px;
+  overflow-y: auto;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  min-width: 200px;
+}
+
+.tramaco-custom-select.open .tramaco-custom-select-options {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Dropdown abierto hacia arriba */
+.tramaco-custom-select-options.open-upward {
+  transform: translateY(10px);
+}
+
+.tramaco-custom-select.open .tramaco-custom-select-options.open-upward {
+  transform: translateY(0);
+}
+
+/* Opción individual */
+.tramaco-custom-select-option {
+  padding: 14px 16px;
+  font-size: 15px;
+  color: #2d2d2d;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-weight: 500;
+}
+
+.tramaco-custom-select-option:hover {
+  background: #f5f6f4;
+}
+
+.tramaco-custom-select-option.selected {
+  background: #6b7547;
+  color: white;
+  font-weight: 600;
+}
+
+.tramaco-custom-select-option:first-child {
+  border-radius: 8px 8px 0 0;
+}
+
+.tramaco-custom-select-option:last-child {
+  border-radius: 0 0 8px 8px;
+}
+
+/* Scrollbar personalizado para opciones */
+.tramaco-custom-select-options::-webkit-scrollbar {
+  width: 8px;
+}
+
+.tramaco-custom-select-options::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 0 8px 8px 0;
+}
+
+.tramaco-custom-select-options::-webkit-scrollbar-thumb {
+  background: #6b7547;
+  border-radius: 4px;
+}
+
+.tramaco-custom-select-options::-webkit-scrollbar-thumb:hover {
+  background: #5a6239;
+}
+
+/* Estado deshabilitado */
+.tramaco-custom-select.disabled .tramaco-custom-select-trigger {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f5f5f5;
+}
+
+/* Animación de carga */
+.tramaco-custom-select.loading .tramaco-custom-select-arrow {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tramaco-custom-select-trigger {
+    font-size: 15px;
+    padding: 12px 14px;
+    min-height: 48px;
+  }
+
+  .tramaco-custom-select-option {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+
+  .tramaco-custom-select-options {
+    max-height: 240px;
+  }
+}

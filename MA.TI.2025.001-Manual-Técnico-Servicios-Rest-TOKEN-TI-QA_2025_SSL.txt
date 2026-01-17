@@ -1,0 +1,927 @@
+                                      MANUAL TÉCNICO DE SERVICIOS REST
+                                                                                               PÁG: 1 de 20
+                                                  MANUAL                                        Versión No. 10
+
+                                                                              Distribución:
+   Código:          Elaborado por:              Aprobado por:                                       Fecha:
+
+                                                                         CLIENTES INTERNOS Y
+MA.TI.2021.001   ÁREA DE TECNOLOGÍA          GERENCIA GENERAL                                  03 – SEP – 2021
+                                                                              EXTERNOS
+
+
+
+
+         MANUAL TÉCNICO DE
+       SERVICIOS REST PRUEBAS Y
+          DESARROLLO CON
+           TOKENIZACIÓN
+                                                 MANUAL TÉCNICO DE SERVICIOS REST
+                                                                                                             PÁG: 1 de 20
+                                                               MANUAL                                         Versión No. 10
+
+                                                                                         Distribución:
+   Código:                    Elaborado por:                 Aprobado por:                                        Fecha:
+
+                                                                                    CLIENTES INTERNOS Y
+MA.TI.2021.001        ÁREA DE TECNOLOGÍA                 GERENCIA GENERAL                                    03 – SEP – 2021
+                                                                                         EXTERNOS
+
+
+
+
+   ELABORADO POR:                              REVISADO POR:                          APROBADO POR:
+
+   ANALISTA DE SOPORTE TÉCNICO                 JEFE DE TECNOLOGÍA                     GERENCIA GENERAL
+
+
+
+   FIRMA:                                      FIRMA:                                 FIMA:
+
+
+
+
+   NOMBRE: CYNTHIA VILLAGRÁN                   NOMBRE: ROMULO SALCEDO                 NOMBRE: ANTONIO CEDEÑO
+
+
+
+   FECHA:    03 – 09 – 2021                    FECHA:   03 – 09 – 2021                FECHA: 03 – 09 – 202
+
+
+
+
+1 Contenido
+
+
+0. CONTROL DE CAMBIOS ............................................................................ 3
+1. OBJETIVO .............................................................................................. 4
+2. ALCANCE ............................................................................................... 4
+3. DEFINICIONES ......................................................................................... 4
+4. ESPECIFICACIONES TÉCNICAS .................................................................... 6
+                                      MANUAL TÉCNICO DE SERVICIOS REST
+                                                                                                     PÁG: 1 de 20
+                                                  MANUAL                                              Versión No. 10
+
+                                                                              Distribución:
+   Código:           Elaborado por:             Aprobado por:                                                Fecha:
+
+                                                                         CLIENTES INTERNOS Y
+MA.TI.2021.001   ÁREA DE TECNOLOGÍA          GERENCIA GENERAL                                        03 – SEP – 2021
+                                                                              EXTERNOS
+
+
+
+
+      0. CONTROL DE CAMBIOS
+
+
+    REVISIÓN #        TIPO DE MODIFICACION                 REVISADO         APROBADO              FECHA
+
+                                                        Jefe de             Gerencia           02 de junio
+         01      Creación de manual de uso
+                                                        Sistemas            General            de 2016
+                                                        Jefe de             Gerencia           18 de julio
+         02      Se agrega campos adicionales
+                                                        Sistemas            General            de 2016
+                 Se agrega campos de                    Jefe de             Gerencia           14 de agosto
+         03
+                 coordenadas                            Sistemas            General            de 2016
+                                                                                               01 de
+                 Se agrega servicio de consulta         Jefe de             Gerencia
+         04                                                                                    septiembre
+                 de precios                             Sistemas            General
+                                                                                               de 2016
+                 Se actualiza campos de código                                                 10 de
+                                                        Jefe de             Gerencia
+         05      de parroquia y productos,                                                     septiembre
+                                                        Sistemas            General
+                 servicios del contrato                                                        de 2016
+                                                                                               05 de
+                 Se agrega el servicio de registro      Jefe de             Gerencia
+         06                                                                                    febrero de
+                 de novedades de una guía.              Sistemas            General
+                                                                                               2017
+                 Se actualiza servicio de
+                                                                                               21 de
+                 autenticación y consulta de            Jefe de             Gerencia
+         07                                                                                    septiembre
+                 precios para agregar nuevos            Sistemas            General
+                                                                                               de 2017
+                 campos de retorno
+                 Actualización de todos los
+                 servicios y se agrega los servicios                                           19 de
+                                                        Jefe de             Gerencia
+         08      de Consulta de Localidades-                                                   noviembre
+                                                        Sistemas            General
+                 Contratos y el servicio de                                                    de 2017
+                 Obtención de Parámetros.
+                 Actualización del manual /             Jefe de             Gerencia           22 de enero
+         09
+                 Actualización URL de acceso            Sistemas            General            de 2019
+                                                                                               10 de
+         10      Actualización manual /                 Jefe de             Gerencia
+                                                                                               noviembre
+                 Actualización URL de acceso            Sistemas            General
+                                                                                               de 2020
+          11     Clasificación de manuales                                                     15 octubre
+                                                        Jefe de             Gerencia
+                 ambientes producción, QA y                                                    de 2021
+                                                        Sistemas            General
+                 tokenización
+                                          MANUAL TÉCNICO DE SERVICIOS REST
+                                                                                                   PÁG: 1 de 20
+                                                      MANUAL                                        Versión No. 10
+
+                                                                                  Distribución:
+   Código:               Elaborado por:             Aprobado por:                                       Fecha:
+
+                                                                             CLIENTES INTERNOS Y
+MA.TI.2021.001       ÁREA DE TECNOLOGÍA          GERENCIA GENERAL                                  03 – SEP – 2021
+                                                                                  EXTERNOS
+
+
+
+
+     1. OBJETIVO
+
+    Describir de forma clara las actividades que se manejan dentro del Área de Gestión Logística. El
+    presente documento tiene por objetivo detallar la invocación de los servicios Rest expuestos por
+    TRAMACOEXPRESS que serán usado por los clientes para realizar las siguientes operaciones:
+
+             a)   Autenticación
+             b)   Cálculo de precios
+             c)   Generar guías
+             d)   Generación de pdf de guías
+             e)   Consulta de tracking de guías.
+             f)   Registro de Novedades
+             g)   Consultar ubicación geográfica
+
+
+
+
+     2. ALCANCE
+
+    El presente Manual Técnico es para conocimiento y aplicación de clientes internos y externos que
+    necesiten integrar sus sistemas de información con nuestras operaciones logísticas.
+
+
+
+     3. DEFINICIONES
+
+    En el presente manual se utilizan los siguientes términos técnicos:
+
+    •   SLAC. - Sistema Logístico de Administración Courier
+    •   Servicio REST. - Deriva de "REpresentational State Transfer", que traducido vendría a ser
+        “transferencia de representación de estado”
+    •   Dirección IP. - Es un número que identifica, de manera lógica y jerárquica, a una Interfaz en red
+    •   Número de Guía. - Los números de guía son utilizados por TRAMACOEXPRESS para identificar y
+        rastrear los envíos a medida que avanzan a través del sistema SLAC hasta que llegan a su
+        destino. El sistema SLAC asigna automáticamente un número de guía a su envío.
+    •   Tracking de Guía. - Muestra todos los eventos que se han generado en el SLAC de cada Número
+        de Guía.
+    •   Token.- Es un identificador único que una aplicación o un sitio web puede usar para acceder a
+        un web service.
+                                         MANUAL TÉCNICO DE SERVICIOS REST
+                                                                                                  PÁG: 1 de 20
+                                                     MANUAL                                        Versión No. 10
+
+                                                                                 Distribución:
+     Código:            Elaborado por:             Aprobado por:                                       Fecha:
+
+                                                                            CLIENTES INTERNOS Y
+MA.TI.2021.001      ÁREA DE TECNOLOGÍA          GERENCIA GENERAL                                  03 – SEP – 2021
+                                                                                 EXTERNOS
+
+
+
+
+4.        GENERALIDADES
+
+     ●   Todos los servicios son REST
+     ●   Se maneja formato tipo Json para parámetros de entrada como respuestas.
+     ●   Todos los servicios deben incluir en la cabecera de la petición (header) el atributo Content-Type
+         con el valor application/json
+     ●   Para consumir los servicios seguros, se debe incluir en la cabecera de la petición (header) el
+         atributo Authorization con el valor del token de seguridad devuelto por el WS de autentificación
+                                              MANUAL TÉCNICO DE SERVICIOS REST
+                                                                                                       PÁG: 1 de 20
+                                                          MANUAL                                        Versión No. 10
+
+                                                                                      Distribución:
+   Código:                  Elaborado por:              Aprobado por:                                       Fecha:
+
+                                                                                 CLIENTES INTERNOS Y
+MA.TI.2021.001           ÁREA DE TECNOLOGÍA          GERENCIA GENERAL                                  03 – SEP – 2021
+                                                                                      EXTERNOS
+
+
+
+
+     5. ESPECIFICACIONES TÉCNICAS
+
+     5.1.        Autenticación del Cliente
+
+    Este servicio permite al cliente autenticarse contra el sistema SLAC.
+
+    Url:        https://wsqa.tramaco.com.ec/dmz-tramaco-comercial-ws/webresources/usuario/autenticar
+
+
+    •           Los datos de entrada son los siguientes:
+
+                        Campo                           Valor                    Obligatorio
+                 EntradaAutenticarWs
+                 Login                 Login del Usuario                         SI
+                 Password              Password del Usuario                      SI
+
+
+
+    •           Los datos de respuesta son los siguientes:
+
+                        Campo                                   Valor
+
+                CuerpoRespuesta
+
+                codigo                 1 , 2, 3
+
+                mensaje                "EXITO","ERROR", "EXEPCION"
+
+                                       Mensaje de Error en caso que la respuesta sea 2
+                excepcion
+                                       ó 3.
+                SalidaAutenticarWs.- Salida del Servicio de Autenticar
+
+                token                  Token de seguridad
+
+
+
+
+    •           Ejemplo de invocación al servicio de autenticación.
+
+            JSON
+
+            {
+                  "login": "1791893451001",
+                  "password": "AbeRGI2018!"
+            }
+                                            MANUAL TÉCNICO DE SERVICIOS REST
+                                                                                                     PÁG: 1 de 20
+                                                           MANUAL                                     Versión No. 10
+
+                                                                                    Distribución:
+   Código:               Elaborado por:                   Aprobado por:                                   Fecha:
+
+                                                                               CLIENTES INTERNOS Y
+MA.TI.2021.001        ÁREA DE TECNOLOGÍA              GERENCIA GENERAL                               03 – SEP – 2021
+                                                                                    EXTERNOS
+
+
+
+
+     5.2.     Calcular Precio
+
+    Este servicio permite al cliente calcular el precio del envío de las guías en el sistema SLAC.
+
+    Url: https://wsqa.tramaco.com.ec/dmz-tramaco-comercial-ws/webresources/guiaTk/calcularPrecio
+
+    •        Los datos de entrada son los siguientes:
+
+                      Campo                                 Valor                   Obligatorio
+             EntradaCalcularPrecioGuiaWs
+             lstCargaDestino .- Listado de Carga y Destino
+             carga .- Datos de la carga
+             alto                         Alto del paquete                         NO
+             ancho                        Ancho del paquete                        NO
+             bultos                       Cantidad de bultos                       SI
+             cajas                        Cantidad de Cajas                        NO
+             cantidadDoc                  Cantidad de Documentos                   NO
+             largo                        Largo del paquete                        NO
+             peso                         Peso del paquete                         SI
+             producto                     Id del producto                          SI
+             adjuntos                     True or False                            SI
+             codigoAdjuntos               Código adjunto                           NO
+             contrato                     Id del contrato (Opcional)               SI
+             valorAsegurado               Valor asegurado                          NO
+             Localidad                    Id de la localidad                       SI
+             LocalidadDestino             Localidad de destino (envío entre        NO
+                                          localidades)
+             codParroquiaDest             Id de parroquia deacuerdo a la           SI
+                                          tabla de direcciones
+             IstServicio.- Listado de Productos disponibles
+             Id                           Id del Servicio                          SI
+
+
+
+
+    •        Los datos de respuesta son los siguientes:
+
+                      Campo                                         Valor
+             CuerpoRespuesta
+             codigo                        1 , 2, 3
+             mensaje                       "EXITO","ERROR", "EXEPCION"
+                                           MANUAL TÉCNICO DE SERVICIOS REST
+                                                                                                    PÁG: 1 de 20
+                                                          MANUAL                                     Versión No. 10
+
+                                                                                   Distribución:
+   Código:                Elaborado por:                 Aprobado por:                                   Fecha:
+
+                                                                              CLIENTES INTERNOS Y
+MA.TI.2021.001        ÁREA DE TECNOLOGÍA           GERENCIA GENERAL                                 03 – SEP – 2021
+                                                                                   EXTERNOS
+
+
+
+
+             excepción                     Mensaje de Error en caso que la respuesta
+                                           sea 2 ó 3.
+             SalidaCalcularPrecioGuiaWs
+             lstGuias.- Listado de Guías generadas
+             id                            Secuencial de la carga destino enviado
+             iva                           Valor de IVA
+             ivaCalculado                  Valor de suma de IVA
+             ivaSeguro                     Valor del IVA del seguro
+             lstProducto.- Listado de Productos a facturar
+             idProducto                    Id del producto
+             valor                         Subtotal a facturar
+             porcentajeIva                 %Iva a facturar
+             valorIva                      Valor del iva a facturar
+             valorPrima                    Valor del seguro a facturar
+             valorIvaPrima                 Valor del iva seguro a facturar
+             lstServicio.- Listado de Servicios a facturar
+             seguro                        Valor de Seguro
+             subTotal                      Subtotal a facturar
+             subtotalConIva                Subtotal con IVA
+             subtotalSinIva                Subtotal sin IVA
+             total                         Valor Total
+             totalCalculado                Valor Total servicios
+
+
+
+    •        Ejemplo de invocación al servicio de calcular precio:
+
+   JSON
+
+   {
+        "codParroquiaRemit": "317",
+        "lstCargaDestino": [
+          {
+          "carga": {
+              "alto": "",
+              "ancho": "",
+              "bultos": "1",
+              "cajas": "",
+              "cantidadDoc": "0",
+              "contrato": "149",
+              "largo": "",
+                                          MANUAL TÉCNICO DE SERVICIOS REST
+                                                                                                   PÁG: 1 de 20
+                                                      MANUAL                                        Versión No. 10
+
+                                                                                  Distribución:
+   Código:               Elaborado por:             Aprobado por:                                       Fecha:
+
+                                                                             CLIENTES INTERNOS Y
+MA.TI.2021.001      ÁREA DE TECNOLOGÍA           GERENCIA GENERAL                                  03 – SEP – 2021
+                                                                                  EXTERNOS
+
+
+
+
+               "localidad": "3299",
+               "localidadDestino": "",
+               "peso": "51",
+               "producto": "1",
+               "valorAsegurado": ""
+           },
+           "codParroquiaDest": "378",
+           "id": "149"
+           }
+       ]
+   }
+                                             MANUAL TÉCNICO DE SERVICIOS REST
+                                                                                                      PÁG: 1 de 20
+                                                         MANUAL                                        Versión No. 10
+
+                                                                                     Distribución:
+   Código:                Elaborado por:                Aprobado por:                                      Fecha:
+
+                                                                                CLIENTES INTERNOS Y
+MA.TI.2021.001        ÁREA DE TECNOLOGÍA             GERENCIA GENERAL                                 03 – SEP – 2021
+                                                                                     EXTERNOS
+
+
+
+
+     5.3.     Generar Guías
+
+    Este servicio permite al cliente generar las guías en el sistema SLAC.
+
+     Url:    https://wsqa.tramaco.com.ec/dmz-tramaco-comercial-ws/webresources/guiaTk/generarGuia
+
+    •        Los datos de entrada son los siguientes:
+
+                      Campo                               Valor                     Obligatorio
+             EntradaGenerarGuiaWs
+             lstCargaDestino .- Listado de Carga y Destino
+             Id                            Secuencial de la carga destino           SI
+             datoAdicional.-
+             motivo                                                                 NO
+             citacion                                                               NO
+             boleta                                                                 NO
+             destinatario.- Datos del destinatario
+             codigoPostal                  Código postal de la dirección del        NO
+                                           destinatario
+             nombres                       Nombres del destinatario                 SI
+             codigoParroquia               Id de parroquia de acuerdo a la          SI
+                                           tabla de direcciones.
+             email                         Email del destinatario                   NO
+             apellidos                     Apellidos del destinatario               SI
+             callePrimaria                 Calle primaria de la dirección           SI
+             telefono                      Teléfono del destinatario                SI
+             calleSecundaria               Calle secundaria de la dirección         SI
+             tipoIden                      Tipo de identificación (05 –             SI
+                                           Cédula, 04 – Ruc, 06 – Pasaporte,
+                                           07 – Venta consumidor final, 08 –
+                                           Identificación del exterior, 09 -
+                                           Placa)
+             referencia                    Referencia de la dirección               SI
+             ciRuc                         Número de Ruc del destinatario           SI
+             numero                        Numeración de la dirección               SI
+             carga .- Datos de la carga
+             alto                          Alto del paquete (opcional)              NO
+             ancho                         Ancho del paquete (opcional)             NO
+                                             MANUAL TÉCNICO DE SERVICIOS REST
+                                                                                                      PÁG: 1 de 20
+                                                         MANUAL                                        Versión No. 10
+
+                                                                                     Distribución:
+   Código:                Elaborado por:                Aprobado por:                                      Fecha:
+
+                                                                                CLIENTES INTERNOS Y
+MA.TI.2021.001        ÁREA DE TECNOLOGÍA             GERENCIA GENERAL                                 03 – SEP – 2021
+                                                                                     EXTERNOS
+
+
+
+
+             bultos                        Cantidad de bultos (opcional)            SI
+             cajas                         Cantidad de Cajas                        NO
+             cantidadDoc                   Cantidad de Documentos                   NO
+             descripcion                   Descripción de la carga                  SI
+             largo                         Largo del paquete                        NO
+             peso                          Peso del paquete                         SI
+             producto                      Id del producto del contrato             SI
+             contrato                      Id del contrato                          SI
+             valorAsegurado                Valor asegurado                          NO
+             adjuntos                      Adjuntos (si o no)                       SI
+             localidad                     Id de la localidad                       SI
+             referenciaTecero              Referencia a una tercera persona         NO
+             guia                          Número de la guía en caso de que NO
+                                           la generación no sea automática
+                                           (Opcional)
+             valorCobro                    Valor de cobro                           NO
+             observacion                   Observación de la carga                  NO
+             remitente .- Datos del remitente
+             apellidos                     Apellidos del remitente                  SI
+             callePrimaria                 Calle primaria de la dirección           SI
+             calleSecundaria               Calle secundaria de la dirección         SI
+             ciRuc                         Cedula o Ruc del remitente               SI
+             codigoParroquia               Id de parroquia de acuerdo a la          SI
+                                           tabla de direcciones.
+             email                         Email del remitente                      SI
+             nombres                       Nombres del remitente                    SI
+             numero                        Numero de casa                           SI
+             referencia                    Referencia de la dirección               SI
+             telefono                      Teléfono del remitente                   SI
+             tipoIden                      Tipo de identificación (05 –             SI
+                                           Cédula, 04 – Ruc, 06 – Pasaporte,
+                                           07 – Venta consumidor final, 08 –
+                                           Identificación del exterior, 09 -
+                                           Placa)
+             codigoPostal                  Código postal de la dirección del        NO
+                                           remitente
+                                            MANUAL TÉCNICO DE SERVICIOS REST
+                                                                                                     PÁG: 1 de 20
+                                                           MANUAL                                     Versión No. 10
+
+                                                                                    Distribución:
+   Código:                Elaborado por:                 Aprobado por:                                    Fecha:
+
+                                                                               CLIENTES INTERNOS Y
+MA.TI.2021.001         ÁREA DE TECNOLOGÍA              GERENCIA GENERAL                              03 – SEP – 2021
+                                                                                    EXTERNOS
+
+
+
+
+    •        Los datos de respuesta son los siguientes:
+
+                         Campo                                      Valor
+                CuerpoRespuesta
+                codigo                      1 , 2, 3
+                mensaje                     "EXITO","ERROR", "EXEPCION"
+                excepción                   Mensaje de Error en caso que la respuesta
+                                            sea 2 ó 3.
+                SalidaGenerarGuiaWs
+                lstGuias.- Listado de Guías generadas
+                Id                          Secuencial de la carga destino enviado
+                guia                        Número de guía generado
+
+
+
+    •        Ejemplo de invocación al servicio de generación de guías.
+
+     JSON
+
+     {
+         "lstCargaDestino": [
+           {
+           "id": 1234,
+           "datoAdicional": {
+               "motivo": "",
+                 "citacion": "",
+                 "boleta": ""
+           },
+           "destinatario": {
+                 "codigoPostal": "",
+                 "nombres": "Lenin",
+                 "codigoParroquia": 290,
+                 "email": "",
+                 "apellidos": "Barrionuevo",
+                 "callePrimaria": "ghghghgh",
+                 "telefono": "0989073800",
+                 "calleSecundaria": "",
+                 "tipoIden": "06",
+                 "referencia": "",
+                 "ciRuc": "1720564358001",
+                 "numero": "678"
+           },
+                                           MANUAL TÉCNICO DE SERVICIOS REST
+                                                                                                    PÁG: 1 de 20
+                                                       MANUAL                                        Versión No. 10
+
+                                                                                   Distribución:
+   Código:                Elaborado por:             Aprobado por:                                       Fecha:
+
+                                                                              CLIENTES INTERNOS Y
+MA.TI.2021.001       ÁREA DE TECNOLOGÍA           GERENCIA GENERAL                                  03 – SEP – 2021
+                                                                                   EXTERNOS
+
+
+
+
+             "carga": {
+             "localidad": 3299,
+             "adjuntos": "",
+             "referenciaTercero": "- GENERADOR HYUNDAI HYH960A CANT 2 /ROTOM001 -
+     - ROTOMARTILLO SDS PLUS HYRH211 CANT 2 / SIERR003 -
+     - SIERRA INGLETADORA HYMS04 POTENCIA:2200 CANT 2",
+             "largo": 0,
+                 "descripcion": "PARTIDO SELECCION ECUADOR",
+                 "valorCobro": 0,
+                 "valorAsegurado": 0,
+                 "contrato": 149,
+                 "peso": "52",
+                 "observacion": "B CANT 2",
+                 "producto": "1",
+                 "ancho": "",
+                 "bultos": "1",
+                 "cajas": "1",
+                 "cantidadDoc":"",
+                 "alto": "",
+                 "guia": ""
+             }
+           }
+         ],
+         "remitente": {
+           "codigoPostal": "",
+           "nombres": "LIGA",
+           "codigoParroquia": 306,
+           "email": "info@liga.ec",
+           "apellidos": "LIGA",
+             "callePrimaria": "",
+             "telefono": "022947449",
+             "calleSecundaria": "PINOS",
+             "tipoIden": "08",
+             "referencia": "",
+             "ciRuc": "3050612112",
+             "numero": "123"
+         }
+     }
+                                             MANUAL TÉCNICO DE SERVICIOS REST
+                                                                                                        PÁG: 1 de 20
+                                                            MANUAL                                       Versión No. 10
+
+                                                                                        Distribución:
+   Código:                 Elaborado por:                 Aprobado por:                                      Fecha:
+
+                                                                                CLIENTES INTERNOS Y
+MA.TI.2021.001          ÁREA DE TECNOLOGÍA              GERENCIA GENERAL                                03 – SEP – 2021
+                                                                                     EXTERNOS
+
+
+
+
+        5.4.     Generación del PDF de Guías
+
+        Este servicio permite al cliente generar el pdf de la(s) guía(s) en el sistema SLAC.
+
+        Url:    https://wsqa.tramaco.com.ec/dmz-tramaco-comercial-ws/webresources/guiaTk/generarPdf
+
+    •          Los datos de entrada son los siguientes:
+
+                       Campo                                Valor                  Obligatorio
+                EntradaGenerarPdfWs
+                guia                    Número de la guía                          SI
+
+    •          Los datos de respuesta son los siguientes:
+
+                        Campo                                        Valor
+               CuerpoRespuesta
+               codigo                        1 , 2, 3
+               mensaje                       "EXITO","ERROR", "EXEPCION"
+               excepcion                     Mensaje de Error en caso que la respuesta
+                                             sea 2 ó 3.
+               SalidaGenerarPdfWs
+               inStrPfd                      InputStream que contiene el pdf
+
+
+
+    •          Ejemplo de invocación al servicio de generación de pdf de guías.
+
+
+   JSON
+
+   {
+        "guias": [
+            "031084000000004"
+        ]
+   }
+                                           MANUAL TÉCNICO DE SERVICIOS REST
+                                                                                                     PÁG: 1 de 20
+                                                          MANUAL                                      Versión No. 10
+
+                                                                                     Distribución:
+   Código:                Elaborado por:                Aprobado por:                                     Fecha:
+
+                                                                              CLIENTES INTERNOS Y
+MA.TI.2021.001        ÁREA DE TECNOLOGÍA              GERENCIA GENERAL                               03 – SEP – 2021
+                                                                                   EXTERNOS
+
+
+
+
+     5.5.     Consulta de Tracking de Guías
+
+    Este servicio permite al cliente consultar el tracking de una guía en el sistema SLAC.
+
+     Url:    https://wsqa.tramaco.com.ec/dmz-tramaco-comercial-ws/webresources/guiaTk/consultarTracking
+
+    •        Los datos de entrada son los siguientes:
+
+                    Campo                                Valor                   Obligatorio
+             EntradaTrackGuiaWs
+             guia                     Número de la guía                         SI
+
+
+
+    •        Los datos de respuesta son los siguientes:
+
+                      Campo                                        Valor
+             RespuestaTrackGuiasWs
+             type
+             CuerpoRespuesta
+             codigo                        1 , 2, 3
+             mensaje                       "EXITO","ERROR", "EXEPCION"
+             excepcion                     Mensaje de Error en caso que la respuesta
+                                           sea 2 ó 3.
+             lstSalidaTrackGuiaWs .- Listado de Carga y Destino
+             estado                        Estado de tracking de la guía
+             ciudad                        Cuidad de ………..
+             descripcion                   Descripción del tracking
+             techaHora                     Fecha y hora del tracking
+             transporte                    Datos del transporte
+             transportista                 Datos del transportista
+             usuario                       Usuario del tracking
+             celularVpn                    Numero de celular del tracking
+             lstServicios.- Listado de Servicios
+             transacción .- Datos de la transacción
+             origen                        Ciudad de origen
+             destino                       Ciudad de destino
+             parOrigen                     Parroquia de origen
+                                            MANUAL TÉCNICO DE SERVICIOS REST
+                                                                                                     PÁG: 1 de 20
+                                                         MANUAL                                       Versión No. 10
+
+                                                                                    Distribución:
+   Código:                Elaborado por:               Aprobado por:                                      Fecha:
+
+                                                                               CLIENTES INTERNOS Y
+MA.TI.2021.001         ÁREA DE TECNOLOGÍA            GERENCIA GENERAL                                03 – SEP – 2021
+                                                                                    EXTERNOS
+
+
+
+
+             parDestino                    Parroquia de destino
+             fecha                         Fecha de la transacción
+             guia                          Número de guía
+             puntoEmision                  Punto de emisión
+             Cliente                       Cliente
+             Contrato                      Número de contrato
+             Observacion                   Observación del paquete
+             localidad                     Nombre de la localidad
+             descripción                   Descripción del paquete
+             centroCosto                   Centro del costo
+             adjunto                       Adjunto
+             Estado                        Describe el estado de la guía
+             producto                      Producto contratado
+             contenedor                    Contenedor
+             factura                       Numero de factura
+             pesoCliente                   Peso
+             pesoReal                      Peso real
+             valorAsegurado                Valor asegurado
+             paquetes                      Número de paquetes
+             gestorEntrega                 Gestor de entrega
+             destinoValido                 Destino válido
+             quienRecibe                   Quien Recibe
+             entregadoPor                  Nombre de la persona que entrega
+             latitud                       Latitud de la coordenada de entrega
+             longitud                      Longitud de la coordenada de entrega
+             destinatario.- Datos del destinatario
+             Apellidos                     Apellidos del destinatario
+             callePrimaria                 Calle primaria de la dirección
+             calleSecundaria               Calle secundaria de la dirección
+             ciRuc                         Cedula o Ruc del destinatario
+             codigoPostal                  Código postal de la dirección del
+                                           destinatario
+             codigoParroquia               Id de parroquia de acuerdo a la tabla de
+                                           direcciones.
+             Email                         Email del destinatario (opcional)
+             Nombres                       Nombres del destinatario
+             Numero                        Numero de casa
+                                           MANUAL TÉCNICO DE SERVICIOS REST
+                                                                                                    PÁG: 1 de 20
+                                                       MANUAL                                        Versión No. 10
+
+                                                                                   Distribución:
+   Código:                Elaborado por:              Aprobado por:                                      Fecha:
+
+                                                                              CLIENTES INTERNOS Y
+MA.TI.2021.001       ÁREA DE TECNOLOGÍA            GERENCIA GENERAL                                 03 – SEP – 2021
+                                                                                   EXTERNOS
+
+
+
+
+             Referencia                    Referencia de la dirección
+             Teléfono                      Teléfono del destinatario
+             tipoIden                      Tipo de identificación (05 – Cédula, 04 – Ruc,
+                                           06 – Pasaporte, 07 – Venta consumidor final,
+                                           08 – Identificación del exterior, 09 - Placa)
+             remitente.- Datos del remite
+             apellidos                     Apellidos del remitente
+             callePrimaria                 Calle primaria de la dirección
+             calleSecundaria               Calle secundaria de la dirección
+             ciRuc                         Cedula o Ruc del remitente
+             codigoParroquia               Id de parroquia de acuerdo a la tabla de
+                                           direcciones.
+             email                         Email del remitente
+             nombres                       Nombres del remitente
+             numero                        Numero de casa
+             referencia                    Referencia de la dirección
+             telefono                      Teléfono del remitente
+             tipoIden                      Tipo de identificación (05 – Cédula, 04 – Ruc,
+                                           06 – Pasaporte, 07 – Venta consumidor final,
+                                           08 – Identificación del exterior, 09 - Placa)
+
+
+
+    •        Ejemplo de invocación al servicio de consulta de tracking de guía.
+
+     JSON
+
+     {
+         "guia": "033002000054786"
+     }
+                                           MANUAL TÉCNICO DE SERVICIOS REST
+                                                                                                    PÁG: 1 de 20
+                                                          MANUAL                                     Versión No. 10
+
+                                                                                   Distribución:
+   Código:               Elaborado por:                 Aprobado por:                                    Fecha:
+
+                                                                              CLIENTES INTERNOS Y
+MA.TI.2021.001        ÁREA DE TECNOLOGÍA              GERENCIA GENERAL                              03 – SEP – 2021
+                                                                                   EXTERNOS
+
+
+
+
+     5.6.     Consultar Localidades-Contratos del Cliente
+
+        Este servicio permite al cliente autenticarse contra el sistema SLAC.
+
+Url: https://wsqa.tramaco.com.ec/dmz-tramaco-comercial-ws/webresources/consultaTk/consultarLocalidadContrato
+
+
+
+    •        Los datos de respuesta son los siguientes:
+
+                       Campo                                       Valor
+             Cuerpo Respuesta
+             código                        1 , 2, 3
+             mensaje                       "EXITO","ERROR", "EXEPCION"
+                                           Mensaje de Error en caso que la respuesta
+             excepción
+                                           sea 2 ó 3.
+             lstContrato .- Listado de Contratos de cliente
+             Id                            Id del contrato
+             numero                        Número del contrato
+             lstProducto .- Listado de Productos disponibles para cada contrato
+              Id                           Id del Producto
+             porKilo
+             tipo                          Tipo del Producto (LIV- Carga Liviana; DOC-
+                                           Documentos)
+             lstServicio .- Listado de Servicios disponibles para cada contrato y
+             producto
+              Id                           Id del Servicio
+              nombre                       Nombre del Servicio
+             porcentaje                    Valor adicional
+                                          Tipo del Servicio (LIV- Carga Liviana; DOC-
+              tipo
+                                          Documentos)
+              metrosLineal                 Indica si se debe enviar un valor de
+                                           cantidad
+             valor
+             lstLocalidad .- Listado de Localidades de cliente
+             id                            Id de la localidad
+             nombre                        Nombre de la localidad
+             idParroquia                   Id de Parroquia
+             callePrimaria                 Calle primaria de la dirección de retiro
+                                            MANUAL TÉCNICO DE SERVICIOS REST
+                                                                                                     PÁG: 1 de 20
+                                                        MANUAL                                        Versión No. 10
+
+                                                                                    Distribución:
+   Código:                Elaborado por:              Aprobado por:                                       Fecha:
+
+                                                                               CLIENTES INTERNOS Y
+MA.TI.2021.001         ÁREA DE TECNOLOGÍA          GERENCIA GENERAL                                  03 – SEP – 2021
+                                                                                    EXTERNOS
+
+
+
+
+             calleSecundaria               Calle secundaria de la dirección de retiro
+             numero                        Numero de casa de la dirección de retiro
+             referencia                    Referencia de la dirección de retiro
+             codigoPostal                  Código Postal de la dirección de retiro
+             activo                        Indica si la localidad se encuentra activa
+             rutas.-
+             Id
+             nombre
+             producto
+                                           MANUAL TÉCNICO DE SERVICIOS REST
+                                                                                                    PÁG: 1 de 20
+                                                          MANUAL                                     Versión No. 10
+
+                                                                                   Distribución:
+   Código:               Elaborado por:                 Aprobado por:                                    Fecha:
+
+                                                                              CLIENTES INTERNOS Y
+MA.TI.2021.001        ÁREA DE TECNOLOGÍA              GERENCIA GENERAL                              03 – SEP – 2021
+                                                                                   EXTERNOS
+
+
+
+
+4.7. Consultar ubicación geográfica
+
+        Este servicio permite al cliente consultar las ubicaciones geográficas.
+
+Url:
+https://wsqa.tramaco.com.ec/dmz-tramaco-comercial-ws/webresources/ubicacionGeografica/consultar
+
+
+
+
+    •        Los datos de respuesta son los siguientes:
+
+                      Campo                                        Valor
+             Cuerpo Respuesta
+             código                        1 , 2, 3
+             mensaje                       "EXITO","ERROR", "EXEPCION"
+                                           Mensaje de Error en caso que la respuesta
+             excepción
+                                           sea 2 ó 3.
+             provincias .-
+             Id                            Id de la provincia
+             nombre                        Número de la provincia
+             cantones .-
+              Id                           Id del cantón
+              nombre                       Nombre del cantón
+             parroquias .-
+              Id                           Id de la parroquia
+              nombre                       Nombre de la parroquia
+

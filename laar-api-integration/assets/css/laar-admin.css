@@ -1,0 +1,348 @@
+/**
+ * Laar Courier API - Estilos Admin
+ * Panel de administración WordPress
+ */
+
+/* =====================================================
+   PANEL DE CONFIGURACIÓN
+===================================================== */
+.wrap h1 {
+  color: #1a237e;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 3px solid #ff6b00;
+}
+
+.wrap h2 {
+  color: #1a237e;
+  margin-top: 25px;
+  padding-top: 15px;
+}
+
+/* =====================================================
+   TABLAS DE FORMULARIO
+===================================================== */
+.form-table th {
+  font-weight: 600;
+  color: #333;
+}
+
+.form-table td input.regular-text,
+.form-table td select,
+.form-table td textarea {
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 12px;
+  transition: border-color 0.3s;
+}
+
+.form-table td input.regular-text:focus,
+.form-table td select:focus,
+.form-table td textarea:focus {
+  border-color: #ff6b00;
+  box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.1);
+  outline: none;
+}
+
+/* =====================================================
+   RESULTADOS DE CONEXIÓN
+===================================================== */
+#connection-result,
+#account-info,
+#productos-list {
+  padding: 15px;
+  border-radius: 6px;
+  margin-top: 15px;
+}
+
+#connection-result.success,
+#account-info.success {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+#connection-result.error {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+/* =====================================================
+   INFORMACIÓN DE CUENTA
+===================================================== */
+.account-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.account-info-item {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+  border-left: 4px solid #ff6b00;
+}
+
+.account-info-item label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.account-info-item span {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a237e;
+}
+
+/* =====================================================
+   LISTA DE PRODUCTOS
+===================================================== */
+.productos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.producto-item {
+  background: linear-gradient(135deg, #ff6b00, #e55a00);
+  color: #fff;
+  padding: 15px;
+  border-radius: 6px;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.producto-item:hover {
+  transform: translateY(-2px);
+}
+
+.producto-item .nombre {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.producto-item .codigo {
+  font-size: 11px;
+  opacity: 0.8;
+  margin-top: 5px;
+}
+
+/* =====================================================
+   FORMULARIOS ADMIN
+===================================================== */
+.laar-form {
+  background: #fff;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.laar-form h3 {
+  color: #1a237e;
+  border-bottom: 2px solid #ff6b00;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  margin-top: 0;
+}
+
+/* =====================================================
+   RESULTADOS DE GUÍA
+===================================================== */
+#guia-result,
+#tracking-result {
+  margin-top: 25px;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+#guia-result.success,
+#tracking-result.success {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+}
+
+#guia-result.error,
+#tracking-result.error {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+
+.guia-success {
+  text-align: center;
+}
+
+.guia-success h4 {
+  color: #155724;
+  margin-bottom: 15px;
+}
+
+.guia-number {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a237e;
+  background: #f8f9fa;
+  padding: 15px 30px;
+  border-radius: 8px;
+  display: inline-block;
+  font-family: "Courier New", monospace;
+  letter-spacing: 2px;
+}
+
+.guia-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* =====================================================
+   TRACKING ADMIN
+===================================================== */
+.tracking-info {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tracking-header {
+  background: linear-gradient(135deg, #1a237e, #0d1357);
+  color: #fff;
+  padding: 20px;
+}
+
+.tracking-header h4 {
+  margin: 0 0 10px;
+}
+
+.tracking-status {
+  display: inline-block;
+  padding: 5px 15px;
+  background: #ff6b00;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tracking-body {
+  padding: 20px;
+}
+
+.tracking-timeline-admin {
+  position: relative;
+  padding-left: 30px;
+}
+
+.tracking-timeline-admin::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #e0e0e0;
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 20px;
+  padding-left: 20px;
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -24px;
+  top: 5px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ff6b00;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 2px #ff6b00;
+}
+
+.timeline-item.completed::before {
+  background: #4caf50;
+  box-shadow: 0 0 0 2px #4caf50;
+}
+
+.timeline-date {
+  font-size: 12px;
+  color: #999;
+}
+
+.timeline-status {
+  font-weight: 600;
+  color: #333;
+  margin: 3px 0;
+}
+
+.timeline-location {
+  font-size: 13px;
+  color: #666;
+}
+
+/* =====================================================
+   TABLA DE SHORTCODES
+===================================================== */
+.widefat code {
+  background: #f1f1f1;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+/* =====================================================
+   LOADING STATE
+===================================================== */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 107, 0, 0.3);
+  border-radius: 50%;
+  border-top-color: #ff6b00;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =====================================================
+   SELECT2 / CIUDADES
+===================================================== */
+#dest_ciudad {
+  min-width: 300px;
+}
+
+/* =====================================================
+   RESPONSIVE ADMIN
+===================================================== */
+@media (max-width: 782px) {
+  .account-info-grid,
+  .productos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .guia-actions {
+    flex-direction: column;
+  }
+
+  .guia-number {
+    font-size: 20px;
+    padding: 10px 15px;
+  }
+}

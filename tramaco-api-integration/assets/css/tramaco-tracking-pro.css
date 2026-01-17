@@ -1,0 +1,464 @@
+/* ESTILOS PROFESIONALES PARA TRACKING - AGREGAR AL FINAL */
+
+/* Header Card con estado principal */
+.tracking-header-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  color: white;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.tracking-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 25px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.status-icon {
+  font-size: 32px;
+}
+
+.status-content {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.status-label {
+  font-size: 12px;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-value {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.tracking-guia-number {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.guia-label {
+  font-size: 12px;
+  opacity: 0.9;
+  text-transform: uppercase;
+}
+
+.guia-value {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+/* Barra de progreso visual */
+.tracking-progress-bar {
+  padding: 40px 30px;
+  background: #f9fafb;
+  position: relative;
+}
+
+.progress-steps {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+  margin-bottom: 15px;
+}
+
+.progress-step {
+  flex: 1;
+  text-align: center;
+  position: relative;
+}
+
+.step-marker {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  border: 3px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.progress-step.active .step-marker {
+  background: #3b82f6;
+  transform: scale(1.1);
+}
+
+.progress-step.completed .step-marker {
+  background: var(--tramaco-success);
+}
+
+.progress-step.current .step-marker {
+  background: var(--tramaco-primary);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(30, 64, 175, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(30, 64, 175, 0);
+  }
+}
+
+.progress-step.completed .step-marker::after {
+  content: "✓";
+  color: white;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.step-label {
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.progress-step.active .step-label {
+  color: var(--tramaco-primary);
+}
+
+.progress-bar-bg {
+  position: absolute;
+  top: 60px;
+  left: 30px;
+  right: 30px;
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  z-index: 1;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--tramaco-success) 0%,
+    var(--tramaco-primary) 100%
+  );
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+/* Grid de información */
+.tracking-info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  padding: 30px;
+}
+
+@media (min-width: 768px) {
+  .tracking-info-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.info-card {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid var(--tramaco-border);
+}
+
+.info-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  color: var(--tramaco-dark);
+  border-bottom: 2px solid var(--tramaco-border);
+  padding-bottom: 10px;
+}
+
+.info-card-title .icon {
+  font-size: 20px;
+}
+
+.info-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px dashed #e5e7eb;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-weight: 600;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.info-value {
+  color: var(--tramaco-dark);
+  font-weight: 500;
+  text-align: right;
+  font-size: 14px;
+}
+
+.info-row.highlighted {
+  background: #d1fae5;
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 5px;
+}
+
+.info-row.highlighted .info-value {
+  color: var(--tramaco-success);
+  font-weight: 700;
+}
+
+/* Descripción del contenido */
+.tracking-description-card {
+  margin: 0 30px 30px;
+  padding: 20px;
+  background: #fffbeb;
+  border-left: 4px solid var(--tramaco-warning);
+  border-radius: 8px;
+}
+
+.tracking-description-card h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px 0;
+  color: #92400e;
+  font-size: 15px;
+}
+
+.tracking-description-card p {
+  margin: 0;
+  color: #78350f;
+  line-height: 1.6;
+}
+
+/* Timeline profesional */
+.tracking-timeline-section {
+  padding: 30px;
+  background: white;
+}
+
+.timeline-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 25px 0;
+  font-size: 18px;
+  color: var(--tramaco-dark);
+}
+
+.tracking-timeline {
+  position: relative;
+  padding-left: 30px;
+}
+
+.tracking-timeline::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    var(--tramaco-primary) 0%,
+    var(--tramaco-border) 100%
+  );
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 25px;
+  padding-bottom: 25px;
+}
+
+.timeline-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -24px;
+  top: 5px;
+  width: 12px;
+  height: 12px;
+  background: white;
+  border: 3px solid #d1d5db;
+  border-radius: 50%;
+  z-index: 2;
+}
+
+.timeline-item.current .timeline-marker {
+  width: 16px;
+  height: 16px;
+  left: -26px;
+  border-color: var(--tramaco-primary);
+  background: var(--tramaco-primary);
+  box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.2);
+  animation: pulse-marker 2s infinite;
+}
+
+@keyframes pulse-marker {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(30, 64, 175, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(30, 64, 175, 0);
+  }
+}
+
+.timeline-content {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 15px 20px;
+  border: 1px solid var(--tramaco-border);
+  transition: all 0.3s ease;
+}
+
+.timeline-item.current .timeline-content {
+  background: #eff6ff;
+  border-color: var(--tramaco-primary);
+  box-shadow: 0 4px 6px rgba(30, 64, 175, 0.1);
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.timeline-status {
+  font-weight: 700;
+  color: var(--tramaco-primary);
+  font-size: 15px;
+}
+
+.timeline-date {
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.timeline-description {
+  color: var(--tramaco-dark);
+  font-size: 14px;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.timeline-details {
+  font-size: 13px;
+  color: #6b7280;
+  padding-top: 8px;
+  border-top: 1px dashed var(--tramaco-border);
+}
+
+/* Footer del tracking */
+.tracking-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 30px;
+  background: #f9fafb;
+  border-top: 1px solid var(--tramaco-border);
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.footer-info {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.footer-label {
+  font-weight: 600;
+  color: var(--tramaco-dark);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tracking-header-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .tracking-guia-number {
+    align-items: center;
+  }
+
+  .progress-steps {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .step-label {
+    font-size: 12px;
+  }
+
+  .info-row {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .info-value {
+    text-align: left;
+  }
+}
+
+/* Estados de seguimiento con colores */
+.status-admision {
+  border-left-color: #f59e0b !important;
+}
+.status-en-transito {
+  border-left-color: #3b82f6 !important;
+}
+.status-en-destino {
+  border-left-color: #8b5cf6 !important;
+}
+.status-en-entrega {
+  border-left-color: #06b6d4 !important;
+}
+.status-entregado {
+  border-left-color: var(--tramaco-success) !important;
+}
+.status-activo {
+  background: rgba(16, 185, 129, 0.1) !important;
+}
