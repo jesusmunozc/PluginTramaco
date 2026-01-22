@@ -16,15 +16,22 @@ if (!defined('ABSPATH')) {
 }
 
 // Definir constantes del plugin
-define('TRAMACO_API_VERSION', '1.0.0');
+define('TRAMACO_API_VERSION', '1.1.0');
 define('TRAMACO_API_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('TRAMACO_API_PLUGIN_URL', plugin_dir_url(__FILE__));
+
+// Cargar módulos adicionales
+require_once TRAMACO_API_PLUGIN_DIR . 'includes/class-tramaco-woocommerce.php';
+require_once TRAMACO_API_PLUGIN_DIR . 'includes/class-tramaco-sharepoint.php';
+require_once TRAMACO_API_PLUGIN_DIR . 'includes/class-tramaco-wc-settings.php';
+require_once TRAMACO_API_PLUGIN_DIR . 'includes/class-tramaco-wc-emails.php';
 
 // URLs de la API (Ambiente QA)
 define('TRAMACO_API_BASE_URL', 'https://wsqa.tramaco.com.ec/dmz-tramaco-comercial-ws/webresources');
 define('TRAMACO_API_AUTH_URL', TRAMACO_API_BASE_URL . '/usuario/autenticar');
 define('TRAMACO_API_GENERAR_GUIA_URL', TRAMACO_API_BASE_URL . '/guiaTk/generarGuia');
 define('TRAMACO_API_GENERAR_PDF_URL', TRAMACO_API_BASE_URL . '/guiaTk/generarPdf');
+define('TRAMACO_API_GENERAR_ETIQUETA_URL', TRAMACO_API_BASE_URL . '/guiaTk/generarEtiquetaGuia10x10Pdf');
 define('TRAMACO_API_TRACKING_URL', TRAMACO_API_BASE_URL . '/guiaTk/consultarTracking');
 define('TRAMACO_API_CALCULAR_PRECIO_URL', TRAMACO_API_BASE_URL . '/guiaTk/calcularPrecio');
 define('TRAMACO_API_LOCALIDAD_CONTRATO_URL', TRAMACO_API_BASE_URL . '/consultaTk/consultarLocalidadContrato');
@@ -67,9 +74,12 @@ class Tramaco_API_Integration {
         add_action('wp_ajax_nopriv_tramaco_cotizacion', array($this, 'ajax_cotizacion'));
         add_action('wp_ajax_tramaco_generar_guia', array($this, 'ajax_generar_guia'));
         add_action('wp_ajax_tramaco_generar_pdf', array($this, 'ajax_generar_pdf'));
+        add_action('wp_ajax_tramaco_generar_etiqueta', array($this, 'ajax_generar_etiqueta'));
         add_action('wp_ajax_tramaco_ubicaciones', array($this, 'ajax_get_ubicaciones'));
         add_action('wp_ajax_nopriv_tramaco_ubicaciones', array($this, 'ajax_get_ubicaciones'));
         add_action('wp_ajax_tramaco_localidades', array($this, 'ajax_get_localidades'));
+        add_action('wp_ajax_tramaco_save_checkout_parroquia', array($this, 'ajax_save_checkout_parroquia'));
+        add_action('wp_ajax_nopriv_tramaco_save_checkout_parroquia', array($this, 'ajax_save_checkout_parroquia'));
     }
     
     public function init() {
@@ -964,6 +974,113 @@ class Tramaco_API_Integration {
     }
     
     /**
+     * AJAX: Generar Etiqueta 10x10 PDF de guías
+     */
+    public function ajax_generar_etiqueta() {
+        check_ajax_referer('tramaco_api_nonce', 'nonce');
+        
+        $guias = isset($_POST['guias']) ? $_POST['guias'] : array();
+        
+        if (empty($guias)) {
+            wp_send_json(array(
+                'success' => false,
+                'message' => 'Número de guía requerido'
+            ));
+        }
+        
+        $token = $this->get_token();
+        
+        if (!$token) {
+            wp_send_json(array(
+                'success' => false,
+                'message' => 'Error de autenticación'
+            ));
+        }
+        
+        $usuario = get_option('tramaco_api_usuario', '8651');
+        
+        // Formatear guías para el endpoint de etiquetas
+        $guias_formateadas = array();
+        foreach ((array) $guias as $guia) {
+            $guias_formateadas[] = array('numeroGuia' => $guia);
+        }
+        
+        $response = wp_remote_post(TRAMACO_API_GENERAR_ETIQUETA_URL, array(
+            'headers' => array(
+                'Content-Type' => 'application/json',
+                'Authorization' => $token
+            ),
+            'body' => json_encode(array(
+                'usuario' => intval($usuario),
+                'guias' => $guias_formateadas,
+                'generaEtiqueta' => true,
+                'generaGuia' => false
+            )),
+            'timeout' => 30,
+            'sslverify' => false
+        ));
+        
+        if (is_wp_error($response)) {
+            wp_send_json(array(
+                'success' => false,
+                'message' => $response->get_error_message()
+            ));
+        }
+        
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+        
+        wp_send_json(array(
+            'success' => isset($body['codigo']) && $body['codigo'] == 1,
+            'data' => $body
+        ));
+    }
+    
+    /**
+     * Generar etiqueta 10x10 de forma pública (para WooCommerce)
+     */
+    public function generar_etiqueta_publica($guias, $usuario = null) {
+        $token = $this->get_token();
+        
+        if (!$token) {
+            return array('success' => false, 'message' => 'Error de autenticación');
+        }
+        
+        $usuario = $usuario ?? get_option('tramaco_api_usuario', '8651');
+        
+        // Formatear guías para el endpoint de etiquetas
+        $guias_formateadas = array();
+        foreach ((array) $guias as $guia) {
+            $guias_formateadas[] = array('numeroGuia' => $guia);
+        }
+        
+        $response = wp_remote_post(TRAMACO_API_GENERAR_ETIQUETA_URL, array(
+            'headers' => array(
+                'Content-Type' => 'application/json',
+                'Authorization' => $token
+            ),
+            'body' => json_encode(array(
+                'usuario' => intval($usuario),
+                'guias' => $guias_formateadas,
+                'generaEtiqueta' => true,
+                'generaGuia' => false
+            )),
+            'timeout' => 30,
+            'sslverify' => false
+        ));
+        
+        if (is_wp_error($response)) {
+            return array('success' => false, 'message' => $response->get_error_message());
+        }
+        
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+        
+        return array(
+            'success' => isset($body['codigo']) && $body['codigo'] == 1,
+            'data' => $body
+        );
+    }
+    
+    /**
      * AJAX: Obtener ubicaciones geográficas
      */
     public function ajax_get_ubicaciones() {
@@ -1006,6 +1123,21 @@ class Tramaco_API_Integration {
             'success' => true,
             'data' => $ubicaciones
         ));
+    }
+    
+    /**
+     * AJAX: Guardar parroquia seleccionada en sesión de WooCommerce
+     */
+    public function ajax_save_checkout_parroquia() {
+        $parroquia = intval($_POST['parroquia'] ?? 0);
+        
+        if ($parroquia && class_exists('WC_Session_Handler')) {
+            if (WC()->session) {
+                WC()->session->set('shipping_tramaco_parroquia', $parroquia);
+            }
+        }
+        
+        wp_send_json_success();
     }
     
     /**

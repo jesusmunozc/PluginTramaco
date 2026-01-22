@@ -1,0 +1,269 @@
+# 🚚 Tramaco API Integration para WooCommerce
+## Guía de Configuración Post-Instalación
+
+---
+
+## 📋 Índice
+1. [Requisitos Previos](#requisitos-previos)
+2. [Instalación del Plugin](#instalación-del-plugin)
+3. [Configuración de Credenciales Tramaco](#configuración-de-credenciales-tramaco)
+4. [Configuración del Método de Envío](#configuración-del-método-de-envío)
+5. [Configuración de SharePoint (Opcional)](#configuración-de-sharepoint-opcional)
+6. [Prueba del Sistema](#prueba-del-sistema)
+7. [Solución de Problemas](#solución-de-problemas)
+
+---
+
+## 🔧 Requisitos Previos
+
+Antes de instalar el plugin, asegúrate de tener:
+
+- ✅ WordPress 5.0 o superior
+- ✅ WooCommerce 4.0 o superior
+- ✅ PHP 7.4 o superior
+- ✅ Extensión PHP cURL habilitada
+- ✅ Extensión PHP JSON habilitada
+- ✅ Certificado SSL (HTTPS) en tu sitio
+- ✅ Credenciales de API Tramaco (proporcionadas por Tramaco)
+
+---
+
+## 📦 Instalación del Plugin
+
+### Opción 1: Subir ZIP desde WordPress Admin
+
+1. Ve a **WordPress Admin → Plugins → Añadir nuevo**
+2. Clic en **"Subir plugin"**
+3. Selecciona el archivo `tramaco-api-integration.zip`
+4. Clic en **"Instalar ahora"**
+5. Una vez instalado, clic en **"Activar plugin"**
+
+### Opción 2: Subir por FTP
+
+1. Descomprime el archivo ZIP
+2. Sube la carpeta `tramaco-api-integration` a `/wp-content/plugins/`
+3. Ve a **WordPress Admin → Plugins**
+4. Busca "Tramaco API Integration" y actívalo
+
+---
+
+## 🔐 Configuración de Credenciales Tramaco
+
+### Paso 1: Acceder a la Configuración
+
+1. Ve a **WordPress Admin → WooCommerce → Ajustes**
+2. Clic en la pestaña **"Tramaco API"**
+
+### Paso 2: Ingresar Credenciales API
+
+Completa los siguientes campos con los datos proporcionados por Tramaco:
+
+| Campo | Descripción | Ejemplo |
+|-------|-------------|---------|
+| **Login (RUC/Cédula)** | Tu número de RUC o cédula registrado | `1793191845001` |
+| **Contraseña API** | Contraseña proporcionada por Tramaco | `MiPassword123` |
+| **ID Usuario** | Identificador de usuario Tramaco | `8651` |
+| **ID Contrato** | Número de contrato con Tramaco | `6394` |
+| **ID Localidad Origen** | Código de tu localidad de envío | `21580` |
+| **ID Producto** | Tipo de servicio contratado | `36` |
+
+### Paso 3: Seleccionar Ambiente
+
+- **Ambiente QA (Pruebas)**: Para probar la integración sin afectar datos reales
+- **Ambiente Producción**: Para operación real con guías válidas
+
+> ⚠️ **IMPORTANTE**: Comienza siempre en ambiente QA para verificar que todo funciona correctamente.
+
+### Paso 4: Guardar Cambios
+
+Clic en **"Guardar cambios"** y verifica que aparezca el mensaje de confirmación.
+
+---
+
+## 🚛 Configuración del Método de Envío
+
+### Paso 1: Crear Zona de Envío
+
+1. Ve a **WooCommerce → Ajustes → Envío**
+2. Clic en **"Añadir zona de envío"**
+3. Nombra la zona (ej: "Ecuador")
+4. En "Regiones de zona", selecciona **Ecuador**
+5. Guarda la zona
+
+### Paso 2: Añadir Método Tramaco
+
+1. En la zona creada, clic en **"Añadir método de envío"**
+2. Selecciona **"Envío Tramaco"**
+3. Clic en **"Añadir método de envío"**
+
+### Paso 3: Configurar el Método
+
+Clic en "Editar" junto al método Tramaco y configura:
+
+| Opción | Descripción | Recomendación |
+|--------|-------------|---------------|
+| **Título** | Nombre que verán los clientes | "Envío Tramaco" |
+| **Habilitar cálculo automático** | Calcula precio según peso y destino | ✅ Activar |
+| **Margen adicional** | Porcentaje extra sobre el costo | 0-10% |
+| **Peso por defecto** | Si producto no tiene peso | 1 kg |
+
+---
+
+## 📊 Configuración de SharePoint (Opcional)
+
+Si deseas enviar automáticamente los datos de cada guía a un Excel en SharePoint:
+
+### Paso 1: Crear Aplicación en Azure AD
+
+1. Ve a [Azure Portal](https://portal.azure.com)
+2. Navega a **Azure Active Directory → Registros de aplicaciones**
+3. Clic en **"Nuevo registro"**
+4. Configura:
+   - Nombre: "Tramaco WooCommerce Integration"
+   - Tipos de cuenta: "Solo esta organización"
+   - URI de redirección: (dejar vacío)
+5. Clic en **"Registrar"**
+
+### Paso 2: Obtener Credenciales
+
+1. Copia el **ID de aplicación (cliente)**
+2. Copia el **ID de directorio (inquilino)**
+3. Ve a **Certificados y secretos → Nuevo secreto de cliente**
+4. Copia el **Valor del secreto** (solo visible una vez)
+
+### Paso 3: Configurar Permisos
+
+1. Ve a **Permisos de API → Agregar permiso**
+2. Selecciona **Microsoft Graph**
+3. Selecciona **Permisos de aplicación**
+4. Añade estos permisos:
+   - `Sites.ReadWrite.All`
+   - `Files.ReadWrite.All`
+5. Clic en **"Conceder consentimiento de administrador"**
+
+### Paso 4: Preparar Excel en SharePoint
+
+1. Crea un archivo Excel en SharePoint
+2. Crea una tabla con estas columnas:
+   ```
+   Fecha | Hora | Pedido | Estado | Total | Guía | Fecha Guía | 
+   Destinatario | Teléfono | Email | Dirección | Ciudad | Parroquia | 
+   Productos | Cantidad | Costo Envío | PDF Guía | Link Pedido | Tracking
+   ```
+3. Nombra la tabla como "TablaPedidos"
+
+### Paso 5: Configurar en WordPress
+
+1. Ve a **WooCommerce → Ajustes → Tramaco API → SharePoint**
+2. Ingresa:
+   - Client ID
+   - Client Secret
+   - Tenant ID
+   - Site ID (ID del sitio SharePoint)
+   - Drive ID (ID del drive)
+   - Item ID (ID del archivo Excel)
+   - Nombre de la tabla
+3. Guarda los cambios
+
+---
+
+## ✅ Prueba del Sistema
+
+### Prueba 1: Verificar Conexión API
+
+1. Ve a **WooCommerce → Ajustes → Tramaco API**
+2. Clic en el botón **"Probar Conexión"**
+3. Deberías ver: "✅ Conexión exitosa"
+
+### Prueba 2: Verificar Cálculo de Envío
+
+1. Ve a tu tienda
+2. Añade un producto al carrito
+3. Ve al carrito y selecciona una dirección de Ecuador
+4. Verifica que aparezca el costo de envío Tramaco
+
+### Prueba 3: Prueba de Pedido Completo
+
+1. Crea un pedido de prueba
+2. Completa el checkout
+3. Verifica en **WooCommerce → Pedidos** que el pedido tenga el número de guía
+4. En la página del pedido, verifica:
+   - Número de guía Tramaco
+   - Botón para descargar PDF
+   - Link de tracking
+
+---
+
+## 🔄 Flujo Automático del Plugin
+
+Una vez configurado, el plugin funciona así:
+
+```
+Cliente hace pedido → Selecciona Tramaco como envío → Pago completado
+                                    ↓
+                    Plugin genera guía automáticamente
+                                    ↓
+        ┌───────────────────────────┼───────────────────────────┐
+        ↓                           ↓                           ↓
+   Guía guardada              PDF almacenado             Datos enviados
+   en el pedido               en WordPress               a SharePoint
+        ↓                           ↓                           ↓
+   Email enviado              Disponible para            Excel actualizado
+   al cliente                 descargar                  automáticamente
+```
+
+---
+
+## ❗ Solución de Problemas
+
+### Error: "No se pudo autenticar"
+- Verifica que las credenciales sean correctas
+- Confirma que el ambiente seleccionado coincide con tus credenciales
+- Contacta a Tramaco si las credenciales son nuevas
+
+### Error: "No se pudo generar la guía"
+- Verifica que todos los datos del cliente estén completos
+- El RUC/Cédula del remitente debe ser válido
+- Verifica que el contrato esté activo
+
+### El costo de envío no aparece
+- Verifica que la zona de envío incluya Ecuador
+- Asegúrate de que el método Tramaco esté habilitado
+- Los productos deben tener peso asignado
+
+### Error de SharePoint
+- Verifica los permisos de la aplicación Azure AD
+- Confirma que el archivo Excel existe y tiene la tabla correcta
+- Revisa que los IDs de Site, Drive e Item sean correctos
+
+### El PDF no se genera
+- Verifica que el número de guía sea válido
+- La guía debe existir en el sistema Tramaco
+- En ambiente QA, algunas guías de prueba pueden no generar PDF
+
+---
+
+## 📞 Soporte
+
+### Tramaco
+- **Teléfono**: (02) 299-0000
+- **Email**: soporte@tramaco.com.ec
+- **Web**: https://www.tramaco.com.ec
+
+### Plugin
+- Revisa los logs en **WooCommerce → Estado → Logs**
+- Busca archivos que empiecen con "tramaco-"
+
+---
+
+## 📝 Notas Importantes
+
+1. **Ambiente de Producción**: Solo cambia a producción cuando hayas probado todo en QA
+2. **Backup**: Siempre haz backup antes de actualizar el plugin
+3. **SSL**: El plugin requiere HTTPS para funcionar correctamente
+4. **Logs**: Habilita los logs en desarrollo para depurar problemas
+
+---
+
+*Última actualización: Enero 2026*
+*Versión del plugin: 1.1.0*

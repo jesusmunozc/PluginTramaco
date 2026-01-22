@@ -1,0 +1,239 @@
+/**
+ * Estilos para el checkout de WooCommerce con Tramaco
+ * 
+ * @package Tramaco_API_Integration
+ * @since 1.1.0
+ */
+
+/* Campos de ubicación Tramaco */
+.tramaco-ubicacion select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+  font-size: 14px;
+  line-height: 1.5;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+}
+
+.tramaco-ubicacion select:focus {
+  border-color: #0073aa;
+  outline: 0;
+  box-shadow: 0 0 0 2px rgba(0, 115, 170, 0.2);
+}
+
+.tramaco-ubicacion select:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* Método de envío Tramaco */
+.woocommerce-shipping-methods .shipping_method[value^="tramaco"] + label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.woocommerce-shipping-methods
+  .shipping_method[value^="tramaco"]
+  + label::before {
+  content: "🚚";
+  font-size: 1.2em;
+}
+
+/* Badge de envío gratis */
+.tramaco-free-shipping-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-left: 8px;
+}
+
+/* Mensaje de cálculo */
+.tramaco-shipping-calculating {
+  color: #666;
+  font-style: italic;
+  font-size: 13px;
+}
+
+.tramaco-shipping-calculating::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  border: 2px solid #ddd;
+  border-top-color: #0073aa;
+  border-radius: 50%;
+  animation: tramaco-spin 0.8s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes tramaco-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Info de envío */
+.tramaco-shipping-info {
+  background: #f8f9fa;
+  border-left: 3px solid #0073aa;
+  padding: 12px 15px;
+  margin: 15px 0;
+  font-size: 13px;
+}
+
+.tramaco-shipping-info .shipping-estimate {
+  color: #666;
+  margin-top: 5px;
+}
+
+.tramaco-shipping-info .shipping-estimate strong {
+  color: #333;
+}
+
+/* Campos requeridos */
+.tramaco-ubicacion.woocommerce-invalid select {
+  border-color: #dc3545;
+}
+
+.tramaco-ubicacion .woocommerce-error {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* Selects mejorados */
+#billing_tramaco_provincia_field,
+#billing_tramaco_canton_field,
+#billing_tramaco_parroquia_field,
+#shipping_tramaco_provincia_field,
+#shipping_tramaco_canton_field,
+#shipping_tramaco_parroquia_field {
+  margin-bottom: 15px;
+}
+
+#billing_tramaco_provincia_field label,
+#billing_tramaco_canton_field label,
+#billing_tramaco_parroquia_field label,
+#shipping_tramaco_provincia_field label,
+#shipping_tramaco_canton_field label,
+#shipping_tramaco_parroquia_field label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+#billing_tramaco_provincia_field label abbr,
+#billing_tramaco_canton_field label abbr,
+#billing_tramaco_parroquia_field label abbr,
+#shipping_tramaco_provincia_field label abbr,
+#shipping_tramaco_canton_field label abbr,
+#shipping_tramaco_parroquia_field label abbr {
+  color: #dc3545;
+  text-decoration: none;
+  border: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tramaco-ubicacion select {
+    font-size: 16px; /* Previene zoom en iOS */
+  }
+}
+
+/* Integración con temas populares */
+
+/* Storefront */
+.storefront .tramaco-ubicacion select {
+  border-radius: 0;
+}
+
+/* Flatsome */
+.flatsome .tramaco-ubicacion select {
+  border-radius: 0;
+  padding: 12px 15px;
+}
+
+/* Astra */
+.ast-woo-two-step-checkout .tramaco-ubicacion select,
+.astra-woocommerce-checkout .tramaco-ubicacion select {
+  border-radius: 2px;
+}
+
+/* OceanWP */
+.oceanwp-theme .tramaco-ubicacion select {
+  padding: 12px 15px;
+}
+
+/* Divi */
+.et_pb_wc_checkout_form .tramaco-ubicacion select {
+  padding: 16px !important;
+}
+
+/* Indicador de carga en los selects */
+.tramaco-ubicacion.loading select {
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23666"><circle cx="12" cy="12" r="3" opacity="0.3"><animate attributeName="opacity" values="0.3;1;0.3" dur="1s" repeatCount="indefinite"/></circle></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 20px;
+}
+
+/* Tooltip de ayuda */
+.tramaco-ubicacion .tooltip {
+  display: inline-block;
+  margin-left: 5px;
+  cursor: help;
+}
+
+.tramaco-ubicacion .tooltip::after {
+  content: "ℹ️";
+  font-size: 12px;
+}
+
+/* Meta box en admin */
+.tramaco-order-metabox {
+  padding: 10px 0;
+}
+
+.tramaco-order-metabox p {
+  margin: 0 0 10px;
+}
+
+.tramaco-order-metabox code {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #f0f0f0;
+  border-radius: 3px;
+  font-family: monospace;
+}
+
+.tramaco-order-metabox .button {
+  margin-right: 5px;
+  margin-top: 5px;
+}
+
+/* Columna de guía en lista de pedidos */
+.column-tramaco_guia {
+  width: 140px;
+}
+
+.column-tramaco_guia code {
+  font-size: 11px;
+  background: #e7f3ff;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.column-tramaco_guia a {
+  text-decoration: none;
+}
