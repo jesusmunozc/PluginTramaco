@@ -51,6 +51,10 @@ class Tramaco_WooCommerce_Integration {
         add_action('wp_ajax_tramaco_calculate_shipping', array($this, 'ajax_calculate_shipping'));
         add_action('wp_ajax_nopriv_tramaco_calculate_shipping', array($this, 'ajax_calculate_shipping'));
         
+        // AJAX para guardar parroquia en sesión
+        add_action('wp_ajax_tramaco_save_checkout_parroquia', array($this, 'ajax_save_checkout_parroquia'));
+        add_action('wp_ajax_nopriv_tramaco_save_checkout_parroquia', array($this, 'ajax_save_checkout_parroquia'));
+        
         // Hooks cuando se completa el pago
         add_action('woocommerce_payment_complete', array($this, 'on_payment_complete'));
         add_action('woocommerce_order_status_processing', array($this, 'on_order_processing'));
@@ -236,8 +240,8 @@ class Tramaco_WooCommerce_Integration {
      * AJAX: Calcular costo de envío
      */
     public function ajax_calculate_shipping() {
-        $parroquia = intval($_POST['parroquia'] ?? 0);
-        $peso = floatval($_POST['peso'] ?? 1);
+        $parroquia = isset($_POST['parroquia']) ? intval($_POST['parroquia']) : 0;
+        $peso = isset($_POST['peso']) ? floatval($_POST['peso']) : 1;
         
         if (!$parroquia) {
             wp_send_json_error(array('message' => 'Parroquia requerida'));
@@ -250,6 +254,38 @@ class Tramaco_WooCommerce_Integration {
         } else {
             wp_send_json_error($result);
         }
+    }
+    
+    /**
+     * AJAX: Guardar parroquia en sesión de WooCommerce
+     */
+    public function ajax_save_checkout_parroquia() {
+        check_ajax_referer('tramaco_api_nonce', 'nonce');
+        
+        $parroquia = isset($_POST['parroquia']) ? intval($_POST['parroquia']) : 0;
+        
+        if (!$parroquia) {
+            wp_send_json_error(array('message' => 'Parroquia inválida'));
+            return;
+        }
+        
+        if (!WC()->session) {
+            wp_send_json_error(array('message' => 'Sesión de WooCommerce no disponible'));
+            return;
+        }
+        
+        // Guardar en sesión
+        WC()->session->set('shipping_tramaco_parroquia', $parroquia);
+        
+        // Log para debug
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('[Tramaco] Parroquia guardada en sesión: ' . $parroquia);
+        }
+        
+        wp_send_json_success(array(
+            'parroquia' => $parroquia,
+            'message' => 'Parroquia guardada correctamente'
+        ));
     }
     
     /**
@@ -327,7 +363,7 @@ class Tramaco_WooCommerce_Integration {
             $total = 0;
             if ($lstGuias && !empty($lstGuias[0])) {
                 $guia = $lstGuias[0];
-                $total = floatval($guia['subTotal'] ?? 0) + floatval($guia['iva'] ?? 0);
+                $total = floatval(isset($guia['subTotal']) ? $guia['subTotal'] : 0) + floatval(isset($guia['iva']) ? $guia['iva'] : 0);
             }
             
             return array(

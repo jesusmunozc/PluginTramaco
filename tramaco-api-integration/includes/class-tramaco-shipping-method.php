@@ -124,9 +124,15 @@ class Tramaco_Shipping_Method extends WC_Shipping_Method {
      * Calcular costo de envío
      */
     public function calculate_shipping($package = array()) {
+        // Log inicial
+        $this->log_debug('==========================================');
+        $this->log_debug('INICIO calculate_shipping()');
+        
         // Verificar si hay envío gratis
         $cart_total = WC()->cart->get_subtotal();
         $free_min = floatval($this->get_option('free_shipping_min', 0));
+        
+        $this->log_debug('Cart total: $' . $cart_total . ', Free shipping min: $' . $free_min);
         
         if ($free_min > 0 && $cart_total >= $free_min) {
             $rate = array(
@@ -139,31 +145,45 @@ class Tramaco_Shipping_Method extends WC_Shipping_Method {
                 )
             );
             
+            $this->log_debug('Envío gratis aplicado');
             $this->add_rate($rate);
             return;
         }
         
         // Obtener parroquia de destino
         $parroquia = $this->get_destination_parroquia($package);
+        $this->log_debug('Parroquia obtenida: ' . ($parroquia ? $parroquia : 'NULL'));
         
         if (!$parroquia) {
             // Si no hay parroquia, mostrar costo por defecto
+            $this->log_debug('⚠️ No hay parroquia - usando fallback');
             $this->add_fallback_rate($package);
             return;
         }
         
         // Calcular peso total
         $peso = $this->calculate_package_weight($package);
+        $this->log_debug('Peso calculado: ' . $peso . ' kg');
         
         // Obtener costo de Tramaco
+        $this->log_debug('Llamando a API de Tramaco...');
         $wc_integration = Tramaco_WooCommerce_Integration::get_instance();
         $result = $wc_integration->calculate_shipping_cost($parroquia, $peso);
+        
+        $this->log_debug('Resultado API - Success: ' . ($result['success'] ? 'SÍ' : 'NO'));
+        $this->log_debug('Resultado API - Total: $' . (isset($result['total']) ? $result['total'] : 0));
+        
+        if (!$result['success']) {
+            $this->log_debug('Resultado API - Error: ' . (isset($result['message']) ? $result['message'] : 'Sin mensaje'));
+        }
         
         if ($result['success'] && $result['total'] > 0) {
             $cost = $result['total'];
             
             // Aplicar tarifa adicional
             $cost = $this->apply_additional_fee($cost, $cart_total);
+            
+            $this->log_debug('✅ Costo final calculado: $' . $cost);
             
             $rate = array(
                 'id' => $this->get_rate_id(),
@@ -180,28 +200,74 @@ class Tramaco_Shipping_Method extends WC_Shipping_Method {
             $this->add_rate($rate);
         } else {
             // Fallback si falla el cálculo
+            $this->log_debug('⚠️ API falló - usando fallback');
             $this->add_fallback_rate($package);
         }
+        
+        $this->log_debug('FIN calculate_shipping()');
+        $this->log_debug('==========================================');
     }
     
     /**
      * Obtener parroquia de destino
      */
     private function get_destination_parroquia($package) {
-        // Primero intentar desde la sesión de WooCommerce
-        $parroquia = WC()->session ? WC()->session->get('shipping_tramaco_parroquia') : null;
+        $parroquia = null;
         
-        if (!$parroquia) {
-            // Intentar desde POST
-            $parroquia = isset($_POST['shipping_tramaco_parroquia']) ? intval($_POST['shipping_tramaco_parroquia']) : null;
+        $this->log_debug('--- Buscando parroquia ---');
+        
+        // 1. Intentar desde POST data (cuando se envía el formulario)
+        if (isset($_POST['post_data'])) {
+            parse_str($_POST['post_data'], $post_data);
+            $parroquia = isset($post_data['shipping_tramaco_parroquia']) ? intval($post_data['shipping_tramaco_parroquia']) : null;
+            
+            if ($parroquia) {
+                $this->log_debug('✓ Encontrada en post_data[shipping_tramaco_parroquia]: ' . $parroquia);
+            }
+            
+            if (!$parroquia) {
+                $parroquia = isset($post_data['billing_tramaco_parroquia']) ? intval($post_data['billing_tramaco_parroquia']) : null;
+                if ($parroquia) {
+                    $this->log_debug('✓ Encontrada en post_data[billing_tramaco_parroquia]: ' . $parroquia);
+                }
+            }
+        }
+        
+        // 2. Intentar desde POST directo
+        if (!$parroquia && isset($_POST['shipping_tramaco_parroquia'])) {
+            $parroquia = intval($_POST['shipping_tramaco_parroquia']);
+            $this->log_debug('✓ Encontrada en POST[shipping_tramaco_parroquia]: ' . $parroquia);
+        }
+        
+        if (!$parroquia && isset($_POST['billing_tramaco_parroquia'])) {
+            $parroquia = intval($_POST['billing_tramaco_parroquia']);
+            $this->log_debug('✓ Encontrada en POST[billing_tramaco_parroquia]: ' . $parroquia);
+        }
+        
+        // 3. Intentar desde la sesión de WooCommerce
+        if (!$parroquia && WC()->session) {
+            $session_parroquia = WC()->session->get('shipping_tramaco_parroquia');
+            if ($session_parroquia) {
+                $parroquia = intval($session_parroquia);
+                $this->log_debug('✓ Encontrada en sesión WC: ' . $parroquia);
+            } else {
+                $this->log_debug('✗ No encontrada en sesión WC');
+            }
+        } else if (!WC()->session) {
+            $this->log_debug('⚠️ Sesión WC no disponible');
+        }
+        
+        // 4. Intentar desde el paquete de destino
+        if (!$parroquia && isset($package['destination']['tramaco_parroquia'])) {
+            $parroquia = intval($package['destination']['tramaco_parroquia']);
+            $this->log_debug('✓ Encontrada en package[destination]: ' . $parroquia);
         }
         
         if (!$parroquia) {
-            // Intentar desde billing
-            $parroquia = isset($_POST['billing_tramaco_parroquia']) ? intval($_POST['billing_tramaco_parroquia']) : null;
+            $this->log_debug('✗ Parroquia no encontrada en ninguna fuente');
         }
         
-        return $parroquia;
+        return $parroquia ? intval($parroquia) : null;
     }
     
     /**
@@ -274,5 +340,14 @@ class Tramaco_Shipping_Method extends WC_Shipping_Method {
         }
         
         return apply_filters('woocommerce_shipping_' . $this->id . '_is_available', $is_available, $package, $this);
+    }
+    
+    /**
+     * Log de debug para diagnóstico
+     */
+    private function log_debug($message) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('[Tramaco Shipping] ' . $message);
+        }
     }
 }

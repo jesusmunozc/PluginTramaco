@@ -203,12 +203,11 @@
 
       // Guardar en sesión para el cálculo de envío
       this.saveToSession(parroquiaCode);
-
-      // Actualizar costos de envío
-      this.updateShipping();
     },
 
     saveToSession: function (parroquiaCode) {
+      var self = this;
+      
       // Usar AJAX para guardar en la sesión de WooCommerce
       $.ajax({
         url: tramacoCheckout.ajaxUrl,
@@ -218,11 +217,22 @@
           parroquia: parroquiaCode,
           nonce: tramacoCheckout.nonce,
         },
+        success: function(response) {
+          console.log('Tramaco: Parroquia guardada en sesión:', parroquiaCode);
+          // Actualizar costos de envío DESPUÉS de guardar
+          self.updateShipping();
+        },
+        error: function(xhr, status, error) {
+          console.error('Tramaco: Error guardando parroquia:', error);
+          // Actualizar de todas formas
+          self.updateShipping();
+        }
       });
     },
 
     updateShipping: function () {
       // Forzar actualización del checkout de WooCommerce
+      console.log('Tramaco: Actualizando checkout...');
       $(document.body).trigger("update_checkout");
     },
 
