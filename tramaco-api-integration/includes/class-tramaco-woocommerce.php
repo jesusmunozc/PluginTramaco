@@ -325,12 +325,17 @@ class Tramaco_WooCommerce_Integration {
                         'localidad' => $localidad,
                         'localidadDestino' => ''
                     ),
-                    'codParroquiaDest' => strval($parroquia_destino),
+                    'codParroquiaDest' => strval($parroquia_destino ?: 378),
                     'id' => '1'
                 )
             ),
             'lstServicio' => array()
         );
+        
+        // Log del request para debugging
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('[Tramaco API] Calcular Precio Request: ' . json_encode($data));
+        }
         
         $response = wp_remote_post(TRAMACO_API_CALCULAR_PRECIO_URL, array(
             'headers' => array(
@@ -343,16 +348,47 @@ class Tramaco_WooCommerce_Integration {
         ));
         
         if (is_wp_error($response)) {
+            $error_msg = $response->get_error_message();
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('[Tramaco API] Error en request: ' . $error_msg);
+            }
             return array(
                 'success' => false,
-                'message' => $response->get_error_message()
+                'message' => $error_msg
             );
         }
         
-        $body = json_decode(wp_remote_retrieve_body($response), true);
+        $response_body = wp_remote_retrieve_body($response);
+        $body = json_decode($response_body, true);
+        
+        // Log de la respuesta completa para debugging
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('[Tramaco API] Calcular Precio Response: ' . $response_body);
+        }
+        
+        // Verificar que se recibió una respuesta válida
+        if (!$body || !is_array($body)) {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('[Tramaco API] Respuesta inválida o vacía');
+            }
+            return array(
+                'success' => false,
+                'message' => 'Respuesta inválida del servidor'
+            );
+        }
+        
+        // Obtener código de respuesta (puede venir como string "1" o int 1)
         $codigo = isset($body['cuerpoRespuesta']['codigo']) ? $body['cuerpoRespuesta']['codigo'] : (isset($body['codigo']) ? $body['codigo'] : null);
         
-        if ($codigo == 1) {
+        // Normalizar código a string para comparación
+        $codigo = strval($codigo);
+        
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('[Tramaco API] Código respuesta: ' . $codigo);
+        }
+        
+        if ($codigo === '1') {
+            // Buscar lstGuias en la respuesta
             $lstGuias = null;
             if (isset($body['salidaCalcularPrecioGuiaWs']['lstGuias'])) {
                 $lstGuias = $body['salidaCalcularPrecioGuiaWs']['lstGuias'];
@@ -363,7 +399,24 @@ class Tramaco_WooCommerce_Integration {
             $total = 0;
             if ($lstGuias && !empty($lstGuias[0])) {
                 $guia = $lstGuias[0];
-                $total = floatval(isset($guia['subTotal']) ? $guia['subTotal'] : 0) + floatval(isset($guia['iva']) ? $guia['iva'] : 0);
+                
+                // Usar el campo 'total' o 'totalCalculado' si está disponible
+                if (isset($guia['total'])) {
+                    $total = floatval($guia['total']);
+                } elseif (isset($guia['totalCalculado'])) {
+                    $total = floatval($guia['totalCalculado']);
+                } else {
+                    // Fallback: calcular sumando subTotal + iva
+                    $total = floatval(isset($guia['subTotal']) ? $guia['subTotal'] : 0) + floatval(isset($guia['iva']) ? $guia['iva'] : 0);
+                }
+                
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log('[Tramaco API] ✅ Costo calculado exitosamente: $' . $total);
+                }
+            } else {
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log('[Tramaco API] ⚠️ lstGuias vacío o no encontrado');
+                }
             }
             
             return array(
@@ -373,9 +426,17 @@ class Tramaco_WooCommerce_Integration {
             );
         }
         
+        // Si el código no es 1, obtener mensaje de error
+        $mensaje = isset($body['cuerpoRespuesta']['mensaje']) ? $body['cuerpoRespuesta']['mensaje'] : (isset($body['mensaje']) ? $body['mensaje'] : 'No se pudo calcular el envío');
+        
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('[Tramaco API] ❌ Error: ' . $mensaje . ' (código: ' . $codigo . ')');
+        }
+        
         return array(
             'success' => false,
-            'message' => 'No se pudo calcular el envío'
+            'message' => $mensaje,
+            'codigo' => $codigo
         );
     }
     
