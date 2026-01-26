@@ -5,7 +5,18 @@
  * @since 1.1.0
  */
 
-/* Campos de ubicación Tramaco */
+/* Campos de ubicación Tramaco - Asegurar visibilidad */
+.tramaco-field {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+}
+
+.tramaco-field.hidden {
+  display: none !important;
+}
+
 .tramaco-ubicacion select {
   width: 100%;
   padding: 10px 12px;

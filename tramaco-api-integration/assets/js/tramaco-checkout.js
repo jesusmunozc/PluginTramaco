@@ -17,22 +17,72 @@
     currentPrefix: "shipping",
 
     init: function () {
+      console.log("Tramaco Checkout: Inicializando...");
+
       this.ubicaciones = tramacoCheckout.ubicaciones;
 
       if (!this.ubicaciones || !this.ubicaciones.lstProvincia) {
         console.warn("Tramaco: No se cargaron las ubicaciones");
+        console.log("Ubicaciones recibidas:", tramacoCheckout.ubicaciones);
         return;
       }
 
+      console.log("Tramaco: Ubicaciones cargadas correctamente");
+      console.log(
+        "Provincias disponibles:",
+        this.ubicaciones.lstProvincia.length,
+      );
+
       this.bindEvents();
       this.initSelects();
+      this.handleCountryVisibility();
+    },
+
+    handleCountryVisibility: function () {
+      // Verificar país actual y mostrar/ocultar campos
+      var billingCountry = $("#billing_country").val();
+      var shippingCountry = $("#shipping_country").val();
+
+      console.log("País Billing:", billingCountry);
+      console.log("País Shipping:", shippingCountry);
+
+      // Mostrar campos si el país es Ecuador
+      if (billingCountry === "EC" || shippingCountry === "EC") {
+        console.log("Tramaco: Mostrando campos para Ecuador");
+        this.showTramacoFields();
+      } else {
+        console.log("Tramaco: Ocultando campos (país no es Ecuador)");
+        this.hideTramacoFields();
+      }
+    },
+
+    showTramacoFields: function () {
+      $(".tramaco-field").removeClass("hidden").show();
+      // Hacer campos requeridos
+      $(
+        "#shipping_tramaco_provincia, #shipping_tramaco_canton, #shipping_tramaco_parroquia",
+      ).prop("required", true);
+      $(
+        "#billing_tramaco_provincia, #billing_tramaco_canton, #billing_tramaco_parroquia",
+      ).prop("required", true);
+    },
+
+    hideTramacoFields: function () {
+      $(".tramaco-field").addClass("hidden").hide();
+      // Quitar requerido
+      $(
+        "#shipping_tramaco_provincia, #shipping_tramaco_canton, #shipping_tramaco_parroquia",
+      ).prop("required", false);
+      $(
+        "#billing_tramaco_provincia, #billing_tramaco_canton, #billing_tramaco_parroquia",
+      ).prop("required", false);
     },
 
     bindEvents: function () {
       var self = this;
 
-      // Cambio de provincia - Shipping
-      $(document).on("change", "#shipping_tramaco_provincia", function () {
+      // Cambio de provincia (shipping_state) - Shipping
+      $(document).on("change", "#shipping_state", function () {
         self.currentPrefix = "shipping";
         self.onProvinciaChange($(this).val(), "shipping");
       });
@@ -49,8 +99,8 @@
         self.onParroquiaChange($(this).val());
       });
 
-      // Cambio de provincia - Billing
-      $(document).on("change", "#billing_tramaco_provincia", function () {
+      // Cambio de provincia (billing_state) - Billing
+      $(document).on("change", "#billing_state", function () {
         self.currentPrefix = "billing";
         self.onProvinciaChange($(this).val(), "billing");
       });
@@ -87,27 +137,62 @@
           var country = $(this).val();
           var prefix = $(this).attr("id").replace("_country", "");
 
+          console.log(
+            "Tramaco: Cambio de país detectado:",
+            country,
+            "Prefix:",
+            prefix,
+          );
+
           // Mostrar/ocultar campos Tramaco según el país
           if (country === "EC") {
-            $("#" + prefix + "_tramaco_provincia_field").show();
-            $("#" + prefix + "_tramaco_canton_field").show();
-            $("#" + prefix + "_tramaco_parroquia_field").show();
+            console.log("Tramaco: Mostrando campos para", prefix);
+            $("#" + prefix + "_state_field")
+              .removeClass("hidden")
+              .show();
+            $("#" + prefix + "_tramaco_canton_field")
+              .removeClass("hidden")
+              .show();
+            $("#" + prefix + "_tramaco_parroquia_field")
+              .removeClass("hidden")
+              .show();
+
+            // Hacer requeridos
+            $("#" + prefix + "_state").prop("required", true);
+            $("#" + prefix + "_tramaco_canton").prop("required", true);
+            $("#" + prefix + "_tramaco_parroquia").prop("required", true);
           } else {
-            $("#" + prefix + "_tramaco_provincia_field").hide();
-            $("#" + prefix + "_tramaco_canton_field").hide();
-            $("#" + prefix + "_tramaco_parroquia_field").hide();
+            console.log("Tramaco: Ocultando campos para", prefix);
+            $("#" + prefix + "_state_field")
+              .addClass("hidden")
+              .hide();
+            $("#" + prefix + "_tramaco_canton_field")
+              .addClass("hidden")
+              .hide();
+            $("#" + prefix + "_tramaco_parroquia_field")
+              .addClass("hidden")
+              .hide();
+
+            // Quitar requerido
+            $("#" + prefix + "_state").prop("required", false);
+            $("#" + prefix + "_tramaco_canton").prop("required", false);
+            $("#" + prefix + "_tramaco_parroquia").prop("required", false);
           }
+
+          // Ejecutar visibilidad general también
+          self.handleCountryVisibility();
         },
       );
 
       // Trigger inicial para país
+      console.log("Tramaco: Ejecutando trigger inicial de país");
       $("#billing_country, #shipping_country").trigger("change");
     },
 
     initSelects: function () {
       // Inicializar los selects si ya tienen valor
-      var billingProvincia = $("#billing_tramaco_provincia").val();
-      var shippingProvincia = $("#shipping_tramaco_provincia").val();
+      var billingProvincia = $("#billing_state").val();
+      var shippingProvincia = $("#shipping_state").val();
 
       if (billingProvincia) {
         this.onProvinciaChange(billingProvincia, "billing");
@@ -156,7 +241,7 @@
 
     onCantonChange: function (cantonCode, prefix) {
       var self = this;
-      var $provincia = $("#" + prefix + "_tramaco_provincia");
+      var $provincia = $("#" + prefix + "_state");
       var $parroquia = $("#" + prefix + "_tramaco_parroquia");
       var provinciaCode = $provincia.val();
 
@@ -207,7 +292,7 @@
 
     saveToSession: function (parroquiaCode) {
       var self = this;
-      
+
       // Usar AJAX para guardar en la sesión de WooCommerce
       $.ajax({
         url: tramacoCheckout.ajaxUrl,
@@ -217,34 +302,32 @@
           parroquia: parroquiaCode,
           nonce: tramacoCheckout.nonce,
         },
-        success: function(response) {
-          console.log('Tramaco: Parroquia guardada en sesión:', parroquiaCode);
+        success: function (response) {
+          console.log("Tramaco: Parroquia guardada en sesión:", parroquiaCode);
           // Actualizar costos de envío DESPUÉS de guardar
           self.updateShipping();
         },
-        error: function(xhr, status, error) {
-          console.error('Tramaco: Error guardando parroquia:', error);
+        error: function (xhr, status, error) {
+          console.error("Tramaco: Error guardando parroquia:", error);
           // Actualizar de todas formas
           self.updateShipping();
-        }
+        },
       });
     },
 
     updateShipping: function () {
       // Forzar actualización del checkout de WooCommerce
-      console.log('Tramaco: Actualizando checkout...');
+      console.log("Tramaco: Actualizando checkout...");
       $(document.body).trigger("update_checkout");
     },
 
     syncBillingToShipping: function () {
-      var billingProvincia = $("#billing_tramaco_provincia").val();
+      var billingProvincia = $("#billing_state").val();
       var billingCanton = $("#billing_tramaco_canton").val();
       var billingParroquia = $("#billing_tramaco_parroquia").val();
 
       if (billingProvincia) {
-        $("#shipping_tramaco_provincia")
-          .val(billingProvincia)
-          .trigger("change");
+        $("#shipping_state").val(billingProvincia).trigger("change");
 
         // Esperar a que se carguen los cantones
         setTimeout(function () {

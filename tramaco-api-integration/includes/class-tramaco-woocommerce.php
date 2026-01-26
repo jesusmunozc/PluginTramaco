@@ -47,6 +47,10 @@ class Tramaco_WooCommerce_Integration {
         add_filter('woocommerce_checkout_fields', array($this, 'custom_checkout_fields'));
         add_action('woocommerce_checkout_update_order_meta', array($this, 'save_custom_checkout_fields'));
         
+        // Establecer Ecuador como país por defecto
+        add_filter('default_checkout_billing_country', array($this, 'set_default_country'));
+        add_filter('default_checkout_shipping_country', array($this, 'set_default_country'));
+        
         // AJAX para actualizar costos de envío
         add_action('wp_ajax_tramaco_calculate_shipping', array($this, 'ajax_calculate_shipping'));
         add_action('wp_ajax_nopriv_tramaco_calculate_shipping', array($this, 'ajax_calculate_shipping'));
@@ -54,6 +58,14 @@ class Tramaco_WooCommerce_Integration {
         // AJAX para guardar parroquia en sesión
         add_action('wp_ajax_tramaco_save_checkout_parroquia', array($this, 'ajax_save_checkout_parroquia'));
         add_action('wp_ajax_nopriv_tramaco_save_checkout_parroquia', array($this, 'ajax_save_checkout_parroquia'));
+        
+        // AJAX para obtener cantones por provincia
+        add_action('wp_ajax_tramaco_get_cantones', array($this, 'ajax_get_cantones'));
+        add_action('wp_ajax_nopriv_tramaco_get_cantones', array($this, 'ajax_get_cantones'));
+        
+        // AJAX para obtener parroquias por cantón
+        add_action('wp_ajax_tramaco_get_parroquias', array($this, 'ajax_get_parroquias'));
+        add_action('wp_ajax_nopriv_tramaco_get_parroquias', array($this, 'ajax_get_parroquias'));
         
         // Hooks cuando se completa el pago
         add_action('woocommerce_payment_complete', array($this, 'on_payment_complete'));
@@ -103,63 +115,78 @@ class Tramaco_WooCommerce_Integration {
         // Obtener ubicaciones de Tramaco
         $ubicaciones = $this->get_ubicaciones_cached();
         
-        // Agregar campos de parroquia después de la ciudad
-        $fields['shipping']['shipping_tramaco_provincia'] = array(
-            'type' => 'select',
-            'label' => __('Provincia', 'tramaco-api'),
-            'required' => true,
-            'class' => array('form-row-wide', 'tramaco-ubicacion'),
-            'priority' => 45,
-            'options' => $this->get_provincias_options($ubicaciones)
-        );
+        // ====== SHIPPING FIELDS ======
         
+        // 1) Reutilizar shipping_state como PROVINCIA (campo estándar de WooCommerce)
+        if (isset($fields['shipping']['shipping_state'])) {
+            $fields['shipping']['shipping_state']['type'] = 'select';
+            $fields['shipping']['shipping_state']['label'] = __('Provincia', 'tramaco-api');
+            $fields['shipping']['shipping_state']['required'] = true;
+            $fields['shipping']['shipping_state']['class'] = array('form-row-first', 'tramaco-field', 'tramaco-provincia');
+            $fields['shipping']['shipping_state']['priority'] = 60;
+            $fields['shipping']['shipping_state']['options'] = $this->get_provincias_options($ubicaciones);
+        }
+        
+        // 2) Cantón
         $fields['shipping']['shipping_tramaco_canton'] = array(
             'type' => 'select',
             'label' => __('Cantón', 'tramaco-api'),
             'required' => true,
-            'class' => array('form-row-wide', 'tramaco-ubicacion'),
-            'priority' => 46,
-            'options' => array('' => __('Seleccione provincia primero...', 'tramaco-api'))
+            'class' => array('form-row-last', 'tramaco-field', 'tramaco-canton'),
+            'options' => array('' => __('Selecciona cantón', 'tramaco-api')),
+            'priority' => 61,
         );
         
+        // 3) Parroquia
         $fields['shipping']['shipping_tramaco_parroquia'] = array(
             'type' => 'select',
             'label' => __('Parroquia', 'tramaco-api'),
             'required' => true,
-            'class' => array('form-row-wide', 'tramaco-ubicacion'),
-            'priority' => 47,
-            'options' => array('' => __('Seleccione cantón primero...', 'tramaco-api'))
+            'class' => array('form-row-wide', 'tramaco-field', 'tramaco-parroquia'),
+            'options' => array('' => __('Selecciona parroquia', 'tramaco-api')),
+            'priority' => 62,
         );
         
-        // Campos para billing también
-        $fields['billing']['billing_tramaco_provincia'] = array(
-            'type' => 'select',
-            'label' => __('Provincia', 'tramaco-api'),
-            'required' => true,
-            'class' => array('form-row-wide', 'tramaco-ubicacion'),
-            'priority' => 45,
-            'options' => $this->get_provincias_options($ubicaciones)
-        );
+        // ====== BILLING FIELDS ======
         
+        // 1) Reutilizar billing_state como PROVINCIA
+        if (isset($fields['billing']['billing_state'])) {
+            $fields['billing']['billing_state']['type'] = 'select';
+            $fields['billing']['billing_state']['label'] = __('Provincia', 'tramaco-api');
+            $fields['billing']['billing_state']['required'] = true;
+            $fields['billing']['billing_state']['class'] = array('form-row-first', 'tramaco-field', 'tramaco-provincia');
+            $fields['billing']['billing_state']['priority'] = 60;
+            $fields['billing']['billing_state']['options'] = $this->get_provincias_options($ubicaciones);
+        }
+        
+        // 2) Cantón
         $fields['billing']['billing_tramaco_canton'] = array(
             'type' => 'select',
             'label' => __('Cantón', 'tramaco-api'),
             'required' => true,
-            'class' => array('form-row-wide', 'tramaco-ubicacion'),
-            'priority' => 46,
-            'options' => array('' => __('Seleccione provincia primero...', 'tramaco-api'))
+            'class' => array('form-row-last', 'tramaco-field', 'tramaco-canton'),
+            'options' => array('' => __('Selecciona cantón', 'tramaco-api')),
+            'priority' => 61,
         );
         
+        // 3) Parroquia
         $fields['billing']['billing_tramaco_parroquia'] = array(
             'type' => 'select',
             'label' => __('Parroquia', 'tramaco-api'),
             'required' => true,
-            'class' => array('form-row-wide', 'tramaco-ubicacion'),
-            'priority' => 47,
-            'options' => array('' => __('Seleccione cantón primero...', 'tramaco-api'))
+            'class' => array('form-row-wide', 'tramaco-field', 'tramaco-parroquia'),
+            'options' => array('' => __('Selecciona parroquia', 'tramaco-api')),
+            'priority' => 62,
         );
         
         return $fields;
+    }
+    
+    /**
+     * Establecer Ecuador como país por defecto
+     */
+    public function set_default_country($country) {
+        return 'EC';
     }
     
     /**
@@ -196,8 +223,47 @@ class Tramaco_WooCommerce_Integration {
                 ));
                 
                 if (!is_wp_error($response)) {
-                    $ubicaciones = json_decode(wp_remote_retrieve_body($response), true);
-                    set_transient('tramaco_ubicaciones', $ubicaciones, DAY_IN_SECONDS);
+                    $body = json_decode(wp_remote_retrieve_body($response), true);
+                    
+                    // Adaptar estructura de la API a la esperada por el frontend
+                    if (isset($body['provincias'])) {
+                        $ubicaciones = array(
+                            'lstProvincia' => array()
+                        );
+                        
+                        foreach ($body['provincias'] as $provincia) {
+                            $cantones = array();
+                            
+                            if (isset($provincia['cantones'])) {
+                                foreach ($provincia['cantones'] as $canton) {
+                                    $parroquias = array();
+                                    
+                                    if (isset($canton['parroquias'])) {
+                                        foreach ($canton['parroquias'] as $parroquia) {
+                                            $parroquias[] = array(
+                                                'codigo' => $parroquia['id'],
+                                                'nombre' => $parroquia['nombre']
+                                            );
+                                        }
+                                    }
+                                    
+                                    $cantones[] = array(
+                                        'codigo' => $canton['id'],
+                                        'nombre' => $canton['nombre'],
+                                        'lstParroquia' => $parroquias
+                                    );
+                                }
+                            }
+                            
+                            $ubicaciones['lstProvincia'][] = array(
+                                'codigo' => $provincia['id'],
+                                'nombre' => $provincia['nombre'],
+                                'lstCanton' => $cantones
+                            );
+                        }
+                        
+                        set_transient('tramaco_ubicaciones', $ubicaciones, DAY_IN_SECONDS);
+                    }
                 }
             }
         }
@@ -211,10 +277,13 @@ class Tramaco_WooCommerce_Integration {
     public function save_custom_checkout_fields($order_id) {
         $order = wc_get_order($order_id);
         
-        // Guardar datos de ubicación de shipping
-        if (!empty($_POST['shipping_tramaco_provincia'])) {
-            $order->update_meta_data('_shipping_tramaco_provincia', sanitize_text_field($_POST['shipping_tramaco_provincia']));
+        // Guardar provincia de shipping_state (campo estándar de WooCommerce ya lo guarda, pero lo registramos también)
+        if (!empty($_POST['shipping_state'])) {
+            // WooCommerce ya guarda esto, pero lo duplicamos para nuestro uso
+            $order->update_meta_data('_shipping_tramaco_provincia', sanitize_text_field($_POST['shipping_state']));
         }
+        
+        // Guardar cantón y parroquia de shipping
         if (!empty($_POST['shipping_tramaco_canton'])) {
             $order->update_meta_data('_shipping_tramaco_canton', sanitize_text_field($_POST['shipping_tramaco_canton']));
         }
@@ -222,10 +291,12 @@ class Tramaco_WooCommerce_Integration {
             $order->update_meta_data('_shipping_tramaco_parroquia', sanitize_text_field($_POST['shipping_tramaco_parroquia']));
         }
         
-        // Guardar datos de ubicación de billing
-        if (!empty($_POST['billing_tramaco_provincia'])) {
-            $order->update_meta_data('_billing_tramaco_provincia', sanitize_text_field($_POST['billing_tramaco_provincia']));
+        // Guardar provincia de billing_state
+        if (!empty($_POST['billing_state'])) {
+            $order->update_meta_data('_billing_tramaco_provincia', sanitize_text_field($_POST['billing_state']));
         }
+        
+        // Guardar cantón y parroquia de billing
         if (!empty($_POST['billing_tramaco_canton'])) {
             $order->update_meta_data('_billing_tramaco_canton', sanitize_text_field($_POST['billing_tramaco_canton']));
         }
@@ -254,6 +325,70 @@ class Tramaco_WooCommerce_Integration {
         } else {
             wp_send_json_error($result);
         }
+    }
+    
+    /**
+     * AJAX: Obtener cantones por provincia
+     */
+    public function ajax_get_cantones() {
+        $provincia_id = isset($_POST['provincia']) ? intval($_POST['provincia']) : 0;
+        
+        if (!$provincia_id) {
+            wp_send_json_error(array('message' => 'Provincia requerida'));
+            return;
+        }
+        
+        $ubicaciones = $this->get_ubicaciones_cached();
+        
+        if (!$ubicaciones || !isset($ubicaciones['lstProvincia'])) {
+            wp_send_json_error(array('message' => 'No se pudieron cargar las ubicaciones'));
+            return;
+        }
+        
+        // Buscar provincia
+        $cantones = array();
+        foreach ($ubicaciones['lstProvincia'] as $provincia) {
+            if ($provincia['codigo'] == $provincia_id && isset($provincia['lstCanton'])) {
+                $cantones = $provincia['lstCanton'];
+                break;
+            }
+        }
+        
+        wp_send_json_success(array('cantones' => $cantones));
+    }
+    
+    /**
+     * AJAX: Obtener parroquias por cantón
+     */
+    public function ajax_get_parroquias() {
+        $canton_id = isset($_POST['canton']) ? intval($_POST['canton']) : 0;
+        
+        if (!$canton_id) {
+            wp_send_json_error(array('message' => 'Cantón requerido'));
+            return;
+        }
+        
+        $ubicaciones = $this->get_ubicaciones_cached();
+        
+        if (!$ubicaciones || !isset($ubicaciones['lstProvincia'])) {
+            wp_send_json_error(array('message' => 'No se pudieron cargar las ubicaciones'));
+            return;
+        }
+        
+        // Buscar cantón en todas las provincias
+        $parroquias = array();
+        foreach ($ubicaciones['lstProvincia'] as $provincia) {
+            if (isset($provincia['lstCanton'])) {
+                foreach ($provincia['lstCanton'] as $canton) {
+                    if ($canton['codigo'] == $canton_id && isset($canton['lstParroquia'])) {
+                        $parroquias = $canton['lstParroquia'];
+                        break 2;
+                    }
+                }
+            }
+        }
+        
+        wp_send_json_success(array('parroquias' => $parroquias));
     }
     
     /**
