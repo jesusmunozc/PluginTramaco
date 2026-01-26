@@ -325,7 +325,7 @@ class Tramaco_WooCommerce_Integration {
                         'localidad' => $localidad,
                         'localidadDestino' => ''
                     ),
-                    'codParroquiaDest' => strval($parroquia_destino ?: 378),
+                    'codParroquiaDest' => strval($parroquia_destino ?: 908),
                     'id' => '1'
                 )
             ),
