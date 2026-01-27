@@ -67,6 +67,32 @@ class Tramaco_WooCommerce_Integration {
         add_action('wp_ajax_tramaco_get_parroquias', array($this, 'ajax_get_parroquias'));
         add_action('wp_ajax_nopriv_tramaco_get_parroquias', array($this, 'ajax_get_parroquias'));
         
+        // ========== CHECKOUT EN 2 PASOS - CARRITO ==========
+        // Mostrar selector de ubicación en la página del carrito (múltiples hooks para compatibilidad)
+        add_action('woocommerce_before_cart_totals', array($this, 'render_cart_location_selector'));
+        add_action('woocommerce_cart_totals_before_shipping', array($this, 'render_cart_location_selector'));
+        add_action('woocommerce_before_cart_collaterals', array($this, 'render_cart_location_selector_once'));
+        
+        // Soporte para WooCommerce Blocks - Inyectar en el footer de la página del carrito
+        add_action('wp_footer', array($this, 'inject_cart_location_for_blocks'));
+        
+        // Soporte para WooCommerce Blocks - Shortcode para insertar en cualquier lugar
+        add_shortcode('tramaco_location_selector', array($this, 'location_selector_shortcode'));
+        
+        // Validar que se haya seleccionado ubicación antes de ir al checkout
+        add_action('woocommerce_check_cart_items', array($this, 'validate_cart_location'));
+        
+        // AJAX para calcular precio de envío desde el carrito
+        add_action('wp_ajax_tramaco_cart_calculate_shipping', array($this, 'ajax_cart_calculate_shipping'));
+        add_action('wp_ajax_nopriv_tramaco_cart_calculate_shipping', array($this, 'ajax_cart_calculate_shipping'));
+        
+        // AJAX para guardar ubicación completa en sesión (provincia, cantón, parroquia)
+        add_action('wp_ajax_tramaco_save_cart_location', array($this, 'ajax_save_cart_location'));
+        add_action('wp_ajax_nopriv_tramaco_save_cart_location', array($this, 'ajax_save_cart_location'));
+        
+        // Pre-llenar campos del checkout con ubicación del carrito
+        add_filter('woocommerce_checkout_get_value', array($this, 'prefill_checkout_fields'), 10, 2);
+        
         // Hooks cuando se completa el pago
         add_action('woocommerce_payment_complete', array($this, 'on_payment_complete'));
         add_action('woocommerce_order_status_processing', array($this, 'on_order_processing'));
@@ -422,6 +448,442 @@ class Tramaco_WooCommerce_Integration {
             'message' => 'Parroquia guardada correctamente'
         ));
     }
+    
+    // ============================================================
+    // CHECKOUT EN 2 PASOS - FUNCIONES PARA EL CARRITO
+    // ============================================================
+    
+    private $cart_selector_rendered = false;
+    
+    /**
+     * Renderizar selector solo una vez (evitar duplicados)
+     */
+    public function render_cart_location_selector_once() {
+        if ($this->cart_selector_rendered) {
+            return;
+        }
+        $this->render_cart_location_selector();
+    }
+    
+    /**
+     * Inyectar selector de ubicación para WooCommerce Blocks (carrito moderno)
+     * Se inyecta via JavaScript en el footer
+     */
+    public function inject_cart_location_for_blocks() {
+        // Solo en la página del carrito
+        if (!is_cart()) {
+            return;
+        }
+        
+        // Verificar si hay productos en el carrito
+        if (!WC()->cart || WC()->cart->is_empty()) {
+            return;
+        }
+        
+        // Obtener ubicaciones y datos
+        $ubicaciones = $this->get_ubicaciones_cached();
+        $saved_provincia = WC()->session ? WC()->session->get('tramaco_cart_provincia', '') : '';
+        $saved_canton = WC()->session ? WC()->session->get('tramaco_cart_canton', '') : '';
+        $saved_parroquia = WC()->session ? WC()->session->get('tramaco_cart_parroquia', '') : '';
+        $saved_shipping_cost = WC()->session ? WC()->session->get('tramaco_calculated_shipping', null) : null;
+        
+        // Generar opciones de provincias
+        $provincias_options = '<option value="">' . esc_html__('Seleccione una provincia...', 'tramaco-api') . '</option>';
+        if (!empty($ubicaciones) && isset($ubicaciones['lstProvincia'])) {
+            foreach ($ubicaciones['lstProvincia'] as $provincia) {
+                $selected = ($saved_provincia == $provincia['codigo']) ? ' selected' : '';
+                $provincias_options .= '<option value="' . esc_attr($provincia['codigo']) . '"' . $selected . '>' . esc_html($provincia['nombre']) . '</option>';
+            }
+        }
+        
+        ?>
+        <script type="text/javascript">
+            (function() {
+                console.log('Tramaco Blocks: Script de inyección cargando...');
+                
+                // HTML del selector
+                var selectorHTML = '<div class="tramaco-cart-location-selector" id="tramaco-cart-location">' +
+                    '<h3>📍 <?php echo esc_js(__('Calcular costo de envío', 'tramaco-api')); ?></h3>' +
+                    '<p class="description"><?php echo esc_js(__('Selecciona tu ubicación para calcular el costo de envío antes de proceder al pago.', 'tramaco-api')); ?></p>' +
+                    '<div class="tramaco-cart-location-fields">' +
+                        '<div class="tramaco-cart-field">' +
+                            '<label for="tramaco_cart_provincia"><?php echo esc_js(__('Provincia', 'tramaco-api')); ?> <abbr class="required" title="<?php echo esc_js(__('requerido', 'tramaco-api')); ?>">*</abbr></label>' +
+                            '<select id="tramaco_cart_provincia" name="tramaco_cart_provincia" class="tramaco-select" required>' +
+                                '<?php echo $provincias_options; ?>' +
+                            '</select>' +
+                        '</div>' +
+                        '<div class="tramaco-cart-field">' +
+                            '<label for="tramaco_cart_canton"><?php echo esc_js(__('Cantón', 'tramaco-api')); ?> <abbr class="required" title="<?php echo esc_js(__('requerido', 'tramaco-api')); ?>">*</abbr></label>' +
+                            '<select id="tramaco_cart_canton" name="tramaco_cart_canton" class="tramaco-select" required disabled>' +
+                                '<option value=""><?php echo esc_js(__('Primero seleccione provincia', 'tramaco-api')); ?></option>' +
+                            '</select>' +
+                        '</div>' +
+                        '<div class="tramaco-cart-field">' +
+                            '<label for="tramaco_cart_parroquia"><?php echo esc_js(__('Parroquia', 'tramaco-api')); ?> <abbr class="required" title="<?php echo esc_js(__('requerido', 'tramaco-api')); ?>">*</abbr></label>' +
+                            '<select id="tramaco_cart_parroquia" name="tramaco_cart_parroquia" class="tramaco-select" required disabled>' +
+                                '<option value=""><?php echo esc_js(__('Primero seleccione cantón', 'tramaco-api')); ?></option>' +
+                            '</select>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="tramaco-cart-shipping-result" id="tramaco-shipping-result" style="display:none;">' +
+                        '<div class="tramaco-shipping-calculated">' +
+                            '<span class="tramaco-shipping-icon">🚚</span>' +
+                            '<span class="tramaco-shipping-label"><?php echo esc_js(__('Costo de envío Tramaco:', 'tramaco-api')); ?></span>' +
+                            '<span class="tramaco-shipping-price" id="tramaco-shipping-price"></span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="tramaco-cart-calculating" id="tramaco-calculating" style="display:none;">' +
+                        '<span class="spinner"></span><?php echo esc_js(__('Calculando costo de envío...', 'tramaco-api')); ?>' +
+                    '</div>' +
+                    '<div class="tramaco-cart-error" id="tramaco-cart-error" style="display:none;"></div>' +
+                    '<div class="tramaco-cart-warning" id="tramaco-cart-warning">' +
+                        '<span class="warning-icon">⚠️</span>' +
+                        '<?php echo esc_js(__('Debes seleccionar tu ubicación para calcular el envío antes de continuar al checkout.', 'tramaco-api')); ?>' +
+                    '</div>' +
+                '</div>';
+                
+                // Función para insertar el selector
+                function insertTramacoSelector() {
+                    // Si ya existe, no duplicar
+                    if (document.getElementById('tramaco-cart-location')) {
+                        console.log('Tramaco Blocks: Selector ya existe');
+                        return true;
+                    }
+                    
+                    // Buscar dónde insertar (WooCommerce Blocks)
+                    var targets = [
+                        '.wp-block-woocommerce-cart-order-summary-block',
+                        '.wc-block-cart__sidebar',
+                        '.wc-block-components-sidebar',
+                        '.wc-block-cart-items',
+                        '.wp-block-woocommerce-cart',
+                        '.wc-block-cart',
+                        '.woocommerce-cart-form',
+                        '.cart-collaterals',
+                        '.woocommerce'
+                    ];
+                    
+                    var container = null;
+                    for (var i = 0; i < targets.length; i++) {
+                        container = document.querySelector(targets[i]);
+                        if (container) {
+                            console.log('Tramaco Blocks: Contenedor encontrado:', targets[i]);
+                            break;
+                        }
+                    }
+                    
+                    if (container) {
+                        var div = document.createElement('div');
+                        div.innerHTML = selectorHTML;
+                        container.parentNode.insertBefore(div.firstElementChild, container);
+                        console.log('Tramaco Blocks: Selector insertado correctamente');
+                        
+                        // Disparar evento para que el JS lo inicialice
+                        if (typeof jQuery !== 'undefined') {
+                            jQuery(document).trigger('tramaco_cart_injected');
+                        }
+                        return true;
+                    }
+                    
+                    console.log('Tramaco Blocks: No se encontró contenedor para insertar');
+                    return false;
+                }
+                
+                // Intentar insertar cuando el DOM esté listo
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', function() {
+                        setTimeout(insertTramacoSelector, 500);
+                    });
+                } else {
+                    setTimeout(insertTramacoSelector, 500);
+                }
+                
+                // También intentar después de un tiempo (para React/Blocks que cargan después)
+                setTimeout(insertTramacoSelector, 1000);
+                setTimeout(insertTramacoSelector, 2000);
+                setTimeout(insertTramacoSelector, 3000);
+            })();
+        </script>
+        <?php
+    }
+    
+    /**
+     * Shortcode para insertar el selector de ubicación manualmente
+     * Uso: [tramaco_location_selector]
+     */
+    public function location_selector_shortcode($atts) {
+        ob_start();
+        $this->render_cart_location_selector();
+        return ob_get_clean();
+    }
+    
+    /**
+     * Renderizar el selector de ubicación en la página del carrito
+     */
+    public function render_cart_location_selector() {
+        // Evitar renderizar más de una vez
+        if ($this->cart_selector_rendered) {
+            return;
+        }
+        $this->cart_selector_rendered = true;
+        // Solo mostrar si hay productos en el carrito
+        if (WC()->cart->is_empty()) {
+            return;
+        }
+        
+        // Obtener ubicaciones
+        $ubicaciones = $this->get_ubicaciones_cached();
+        
+        // Obtener valores guardados en sesión
+        $saved_provincia = WC()->session ? WC()->session->get('tramaco_cart_provincia', '') : '';
+        $saved_canton = WC()->session ? WC()->session->get('tramaco_cart_canton', '') : '';
+        $saved_parroquia = WC()->session ? WC()->session->get('tramaco_cart_parroquia', '') : '';
+        $saved_shipping_cost = WC()->session ? WC()->session->get('tramaco_calculated_shipping', null) : null;
+        
+        ?>
+        <div class="tramaco-cart-location-selector" id="tramaco-cart-location">
+            <h3><?php _e('📍 Calcular costo de envío', 'tramaco-api'); ?></h3>
+            <p class="description"><?php _e('Selecciona tu ubicación para calcular el costo de envío antes de proceder al pago.', 'tramaco-api'); ?></p>
+            
+            <div class="tramaco-cart-location-fields">
+                <!-- Provincia -->
+                <div class="tramaco-cart-field">
+                    <label for="tramaco_cart_provincia"><?php _e('Provincia', 'tramaco-api'); ?> <abbr class="required" title="<?php _e('requerido', 'tramaco-api'); ?>">*</abbr></label>
+                    <select id="tramaco_cart_provincia" name="tramaco_cart_provincia" class="tramaco-select" required>
+                        <option value=""><?php _e('Seleccione una provincia...', 'tramaco-api'); ?></option>
+                        <?php if (!empty($ubicaciones) && isset($ubicaciones['lstProvincia'])): ?>
+                            <?php foreach ($ubicaciones['lstProvincia'] as $provincia): ?>
+                                <option value="<?php echo esc_attr($provincia['codigo']); ?>" <?php selected($saved_provincia, $provincia['codigo']); ?>>
+                                    <?php echo esc_html($provincia['nombre']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                </div>
+                
+                <!-- Cantón -->
+                <div class="tramaco-cart-field">
+                    <label for="tramaco_cart_canton"><?php _e('Cantón', 'tramaco-api'); ?> <abbr class="required" title="<?php _e('requerido', 'tramaco-api'); ?>">*</abbr></label>
+                    <select id="tramaco_cart_canton" name="tramaco_cart_canton" class="tramaco-select" required disabled>
+                        <option value=""><?php _e('Primero seleccione provincia', 'tramaco-api'); ?></option>
+                    </select>
+                </div>
+                
+                <!-- Parroquia -->
+                <div class="tramaco-cart-field">
+                    <label for="tramaco_cart_parroquia"><?php _e('Parroquia', 'tramaco-api'); ?> <abbr class="required" title="<?php _e('requerido', 'tramaco-api'); ?>">*</abbr></label>
+                    <select id="tramaco_cart_parroquia" name="tramaco_cart_parroquia" class="tramaco-select" required disabled>
+                        <option value=""><?php _e('Primero seleccione cantón', 'tramaco-api'); ?></option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Resultado del cálculo -->
+            <div class="tramaco-cart-shipping-result" id="tramaco-shipping-result" style="<?php echo $saved_shipping_cost ? '' : 'display:none;'; ?>">
+                <?php if ($saved_shipping_cost): ?>
+                    <div class="tramaco-shipping-calculated">
+                        <span class="tramaco-shipping-icon">🚚</span>
+                        <span class="tramaco-shipping-label"><?php _e('Costo de envío Tramaco:', 'tramaco-api'); ?></span>
+                        <span class="tramaco-shipping-price" id="tramaco-shipping-price">
+                            <?php echo wc_price($saved_shipping_cost); ?>
+                        </span>
+                    </div>
+                <?php else: ?>
+                    <div class="tramaco-shipping-calculated">
+                        <span class="tramaco-shipping-icon">🚚</span>
+                        <span class="tramaco-shipping-label"><?php _e('Costo de envío Tramaco:', 'tramaco-api'); ?></span>
+                        <span class="tramaco-shipping-price" id="tramaco-shipping-price"></span>
+                    </div>
+                <?php endif; ?>
+            </div>
+            
+            <!-- Mensaje de cálculo en proceso -->
+            <div class="tramaco-cart-calculating" id="tramaco-calculating" style="display:none;">
+                <span class="spinner"></span>
+                <?php _e('Calculando costo de envío...', 'tramaco-api'); ?>
+            </div>
+            
+            <!-- Mensaje de error -->
+            <div class="tramaco-cart-error" id="tramaco-cart-error" style="display:none;"></div>
+            
+            <!-- Mensaje de advertencia si no hay ubicación -->
+            <div class="tramaco-cart-warning" id="tramaco-cart-warning" <?php echo $saved_parroquia ? 'style="display:none;"' : ''; ?>>
+                <span class="warning-icon">⚠️</span>
+                <?php _e('Debes seleccionar tu ubicación para calcular el envío antes de continuar al checkout.', 'tramaco-api'); ?>
+            </div>
+        </div>
+        
+        <script type="text/javascript">
+            // Pasar datos de ubicaciones al JavaScript
+            var tramacoCartData = {
+                ubicaciones: <?php echo json_encode($ubicaciones); ?>,
+                savedProvincia: '<?php echo esc_js($saved_provincia); ?>',
+                savedCanton: '<?php echo esc_js($saved_canton); ?>',
+                savedParroquia: '<?php echo esc_js($saved_parroquia); ?>',
+                ajaxUrl: '<?php echo admin_url('admin-ajax.php'); ?>',
+                nonce: '<?php echo wp_create_nonce('tramaco_api_nonce'); ?>',
+                i18n: {
+                    selectProvincia: '<?php _e('Seleccione una provincia...', 'tramaco-api'); ?>',
+                    selectCanton: '<?php _e('Seleccione un cantón...', 'tramaco-api'); ?>',
+                    selectParroquia: '<?php _e('Seleccione una parroquia...', 'tramaco-api'); ?>',
+                    calculating: '<?php _e('Calculando...', 'tramaco-api'); ?>',
+                    error: '<?php _e('Error al calcular el envío', 'tramaco-api'); ?>',
+                    firstSelectProvince: '<?php _e('Primero seleccione provincia', 'tramaco-api'); ?>',
+                    firstSelectCanton: '<?php _e('Primero seleccione cantón', 'tramaco-api'); ?>'
+                }
+            };
+        </script>
+        <?php
+    }
+    
+    /**
+     * Validar que se haya seleccionado ubicación antes de ir al checkout
+     */
+    public function validate_cart_location() {
+        // Solo validar en checkout, no en carrito
+        if (!is_checkout()) {
+            return;
+        }
+        
+        // Verificar si hay parroquia guardada en sesión
+        if (!WC()->session) {
+            return;
+        }
+        
+        $parroquia = WC()->session->get('tramaco_cart_parroquia', '');
+        $parroquia_checkout = WC()->session->get('shipping_tramaco_parroquia', '');
+        
+        // Si no hay parroquia ni en carrito ni en checkout, mostrar error
+        if (empty($parroquia) && empty($parroquia_checkout)) {
+            wc_add_notice(
+                __('Por favor, selecciona tu ubicación (provincia, cantón y parroquia) en la página del carrito para calcular el costo de envío antes de continuar.', 'tramaco-api'),
+                'error'
+            );
+        }
+    }
+    
+    /**
+     * AJAX: Calcular precio de envío desde el carrito
+     */
+    public function ajax_cart_calculate_shipping() {
+        check_ajax_referer('tramaco_api_nonce', 'nonce');
+        
+        $parroquia = isset($_POST['parroquia']) ? intval($_POST['parroquia']) : 0;
+        
+        if (!$parroquia) {
+            wp_send_json_error(array('message' => __('Parroquia requerida', 'tramaco-api')));
+            return;
+        }
+        
+        // Calcular peso total del carrito
+        $peso_total = 0;
+        $default_weight = 1; // kg por defecto
+        
+        foreach (WC()->cart->get_cart() as $cart_item) {
+            $product = $cart_item['data'];
+            $product_weight = $product->get_weight();
+            
+            if ($product_weight) {
+                $peso_total += wc_get_weight(floatval($product_weight), 'kg') * $cart_item['quantity'];
+            } else {
+                $peso_total += $default_weight * $cart_item['quantity'];
+            }
+        }
+        
+        // Peso mínimo 1kg
+        $peso_total = max(1, $peso_total);
+        
+        // Calcular costo de envío
+        $result = $this->calculate_shipping_cost($parroquia, $peso_total);
+        
+        if ($result['success'] && $result['total'] > 0) {
+            // Guardar en sesión para usar en checkout
+            WC()->session->set('tramaco_calculated_shipping', $result['total']);
+            WC()->session->set('shipping_tramaco_parroquia', $parroquia);
+            
+            wp_send_json_success(array(
+                'total' => $result['total'],
+                'total_formatted' => wc_price($result['total']),
+                'peso' => $peso_total,
+                'message' => __('Costo calculado correctamente', 'tramaco-api')
+            ));
+        } else {
+            wp_send_json_error(array(
+                'message' => isset($result['message']) ? $result['message'] : __('No se pudo calcular el envío', 'tramaco-api')
+            ));
+        }
+    }
+    
+    /**
+     * AJAX: Guardar ubicación completa en sesión (provincia, cantón, parroquia)
+     */
+    public function ajax_save_cart_location() {
+        check_ajax_referer('tramaco_api_nonce', 'nonce');
+        
+        $provincia = isset($_POST['provincia']) ? sanitize_text_field($_POST['provincia']) : '';
+        $canton = isset($_POST['canton']) ? sanitize_text_field($_POST['canton']) : '';
+        $parroquia = isset($_POST['parroquia']) ? sanitize_text_field($_POST['parroquia']) : '';
+        
+        if (!WC()->session) {
+            wp_send_json_error(array('message' => __('Sesión no disponible', 'tramaco-api')));
+            return;
+        }
+        
+        // Guardar en sesión
+        WC()->session->set('tramaco_cart_provincia', $provincia);
+        WC()->session->set('tramaco_cart_canton', $canton);
+        WC()->session->set('tramaco_cart_parroquia', $parroquia);
+        
+        // También guardar para el método de envío
+        if ($parroquia) {
+            WC()->session->set('shipping_tramaco_parroquia', $parroquia);
+        }
+        
+        // Log para debug
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('[Tramaco Cart] Ubicación guardada - Provincia: ' . $provincia . ', Cantón: ' . $canton . ', Parroquia: ' . $parroquia);
+        }
+        
+        wp_send_json_success(array(
+            'message' => __('Ubicación guardada correctamente', 'tramaco-api'),
+            'provincia' => $provincia,
+            'canton' => $canton,
+            'parroquia' => $parroquia
+        ));
+    }
+    
+    /**
+     * Pre-llenar campos del checkout con ubicación guardada en carrito
+     */
+    public function prefill_checkout_fields($value, $input) {
+        if (!WC()->session) {
+            return $value;
+        }
+        
+        // Pre-llenar campos de shipping
+        switch ($input) {
+            case 'shipping_state':
+            case 'billing_state':
+                $provincia = WC()->session->get('tramaco_cart_provincia', '');
+                return $provincia ? $provincia : $value;
+                
+            case 'shipping_tramaco_canton':
+            case 'billing_tramaco_canton':
+                $canton = WC()->session->get('tramaco_cart_canton', '');
+                return $canton ? $canton : $value;
+                
+            case 'shipping_tramaco_parroquia':
+            case 'billing_tramaco_parroquia':
+                $parroquia = WC()->session->get('tramaco_cart_parroquia', '');
+                return $parroquia ? $parroquia : $value;
+        }
+        
+        return $value;
+    }
+    
+    // ============================================================
+    // FIN - CHECKOUT EN 2 PASOS
+    // ============================================================
     
     /**
      * Calcular costo de envío usando API Tramaco
@@ -1148,25 +1610,45 @@ class Tramaco_WooCommerce_Integration {
     }
     
     /**
-     * Enqueue scripts para checkout
+     * Enqueue scripts para checkout y carrito
      */
     public function enqueue_checkout_scripts() {
-        if (!is_checkout()) {
+        // Cargar en checkout Y en carrito para el checkout en 2 pasos
+        if (!is_checkout() && !is_cart()) {
             return;
+        }
+        
+        // Dependencias base
+        $dependencies = array('jquery');
+        
+        // Agregar dependencias específicas según la página
+        if (is_checkout()) {
+            $dependencies[] = 'wc-checkout';
+        }
+        if (is_cart()) {
+            $dependencies[] = 'wc-cart';
         }
         
         wp_enqueue_script(
             'tramaco-checkout',
             TRAMACO_API_PLUGIN_URL . 'assets/js/tramaco-checkout.js',
-            array('jquery', 'wc-checkout'),
+            $dependencies,
             TRAMACO_API_VERSION,
             true
         );
         
+        // Datos comunes
+        $ubicaciones = $this->get_ubicaciones_cached();
+        $ajax_url = admin_url('admin-ajax.php');
+        $nonce = wp_create_nonce('tramaco_api_nonce');
+        
+        // Localizar script para checkout
         wp_localize_script('tramaco-checkout', 'tramacoCheckout', array(
-            'ajaxUrl' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('tramaco_api_nonce'),
-            'ubicaciones' => $this->get_ubicaciones_cached(),
+            'ajaxUrl' => $ajax_url,
+            'nonce' => $nonce,
+            'ubicaciones' => $ubicaciones,
+            'isCart' => is_cart(),
+            'isCheckout' => is_checkout(),
             'i18n' => array(
                 'selectProvincia' => __('Seleccione una provincia...', 'tramaco-api'),
                 'selectCanton' => __('Seleccione un cantón...', 'tramaco-api'),
@@ -1174,6 +1656,33 @@ class Tramaco_WooCommerce_Integration {
                 'loading' => __('Cargando...', 'tramaco-api')
             )
         ));
+        
+        // También pasar datos para el carrito (tramacoCartData)
+        if (is_cart()) {
+            $saved_provincia = WC()->session ? WC()->session->get('tramaco_cart_provincia', '') : '';
+            $saved_canton = WC()->session ? WC()->session->get('tramaco_cart_canton', '') : '';
+            $saved_parroquia = WC()->session ? WC()->session->get('tramaco_cart_parroquia', '') : '';
+            $saved_shipping_cost = WC()->session ? WC()->session->get('tramaco_calculated_shipping', null) : null;
+            
+            wp_localize_script('tramaco-checkout', 'tramacoCartData', array(
+                'ubicaciones' => $ubicaciones,
+                'savedProvincia' => $saved_provincia,
+                'savedCanton' => $saved_canton,
+                'savedParroquia' => $saved_parroquia,
+                'savedShippingCost' => $saved_shipping_cost,
+                'ajaxUrl' => $ajax_url,
+                'nonce' => $nonce,
+                'i18n' => array(
+                    'selectProvincia' => __('Seleccione una provincia...', 'tramaco-api'),
+                    'selectCanton' => __('Seleccione un cantón...', 'tramaco-api'),
+                    'selectParroquia' => __('Seleccione una parroquia...', 'tramaco-api'),
+                    'calculating' => __('Calculando...', 'tramaco-api'),
+                    'error' => __('Error al calcular el envío', 'tramaco-api'),
+                    'firstSelectProvince' => __('Primero seleccione provincia', 'tramaco-api'),
+                    'firstSelectCanton' => __('Primero seleccione cantón', 'tramaco-api')
+                )
+            ));
+        }
         
         wp_enqueue_style(
             'tramaco-checkout',
