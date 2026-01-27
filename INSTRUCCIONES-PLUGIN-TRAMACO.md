@@ -1,16 +1,19 @@
 # 🚚 Tramaco API Integration para WooCommerce
+
 ## Guía de Configuración Post-Instalación
 
 ---
 
 ## 📋 Índice
+
 1. [Requisitos Previos](#requisitos-previos)
 2. [Instalación del Plugin](#instalación-del-plugin)
-3. [Configuración de Credenciales Tramaco](#configuración-de-credenciales-tramaco)
-4. [Configuración del Método de Envío](#configuración-del-método-de-envío)
-5. [Configuración de SharePoint (Opcional)](#configuración-de-sharepoint-opcional)
-6. [Prueba del Sistema](#prueba-del-sistema)
-7. [Solución de Problemas](#solución-de-problemas)
+3. [WooCommerce Clásico vs WooCommerce Blocks](#woocommerce-clásico-vs-woocommerce-blocks)
+4. [Configuración de Credenciales Tramaco](#configuración-de-credenciales-tramaco)
+5. [Configuración del Método de Envío](#configuración-del-método-de-envío)
+6. [Configuración de SharePoint (Opcional)](#configuración-de-sharepoint-opcional)
+7. [Prueba del Sistema](#prueba-del-sistema)
+8. [Solución de Problemas](#solución-de-problemas)
 
 ---
 
@@ -47,6 +50,80 @@ Antes de instalar el plugin, asegúrate de tener:
 
 ---
 
+## 🧱 WooCommerce Clásico vs WooCommerce Blocks
+
+### ¿Por qué es importante saber qué versión usas?
+
+El plugin necesita mostrar **selectores de Provincia, Cantón y Parroquia** para calcular el costo de envío con la API de Tramaco. Sin embargo, WooCommerce tiene **dos formas diferentes** de renderizar las páginas de carrito y checkout:
+
+#### 1. WooCommerce Clásico (Shortcodes)
+
+- Usa shortcodes como `[woocommerce_cart]` y `[woocommerce_checkout]`
+- Los hooks de PHP tradicionales funcionan correctamente
+- El plugin puede inyectar campos directamente usando `woocommerce_before_cart_totals`
+
+#### 2. WooCommerce Blocks (Gutenberg) - A partir de WooCommerce 8.3+
+
+- Usa bloques de Gutenberg como `<!-- wp:woocommerce/cart -->`
+- Es una aplicación React que se renderiza en el cliente
+- **Los hooks tradicionales de PHP NO funcionan** porque la página se construye con JavaScript
+- El plugin debe inyectar el HTML dinámicamente via JavaScript en el footer
+
+### ¿Cómo saber cuál estás usando?
+
+1. Ve a **WordPress Admin → Páginas → Carrito**
+2. Edita la página y observa:
+
+| Si ves...                                           | Estás usando...         |
+| --------------------------------------------------- | ----------------------- |
+| Shortcode `[woocommerce_cart]` en el contenido      | WooCommerce **Clásico** |
+| Bloques visuales con "Cart" en el editor de bloques | WooCommerce **Blocks**  |
+
+### Compatibilidad del Plugin
+
+✅ **El plugin soporta ambas versiones automáticamente:**
+
+- **Clásico**: Los selectores se inyectan via hooks PHP tradicionales
+- **Blocks**: Los selectores se inyectan via JavaScript en el footer de la página
+
+> 💡 **Nota técnica**: Para WooCommerce Blocks, el plugin usa `wp_footer` para inyectar un script que detecta los contenedores de Blocks (`.wc-block-cart`, `.wp-block-woocommerce-cart`, etc.) e inserta el formulario de ubicación dinámicamente después de que React renderiza la página.
+
+### Checkout en 2 Pasos
+
+Debido a que el checkout de WooCommerce (ya sea clásico o Blocks) es un formulario predefinido que no podemos modificar fácilmente para agregar campos de parroquia, el plugin implementa un **flujo de 2 pasos**:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  PASO 1: Página del Carrito (/cart/)                            │
+│  ────────────────────────────────────────────────────────────   │
+│  📍 Calcular costo de envío                                     │
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐            │
+│  │ Provincia ▼  │ │  Cantón ▼    │ │ Parroquia ▼  │            │
+│  └──────────────┘ └──────────────┘ └──────────────┘            │
+│                                                                 │
+│  🚚 Costo de envío Tramaco: $5.44                              │
+│                                                                 │
+│  [Proceder al pago]                                            │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│  PASO 2: Página de Checkout (/checkout/)                        │
+│  ────────────────────────────────────────────────────────────   │
+│  • Campos de ubicación pre-llenados automáticamente             │
+│  • Costo de envío ya calculado                                  │
+│  • El cliente solo completa datos de pago                       │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+Este enfoque permite:
+
+- ✅ Mostrar el costo de envío ANTES de ir al checkout
+- ✅ No modificar el formulario de checkout de WooCommerce
+- ✅ Funcionar tanto con WooCommerce Clásico como con Blocks
+- ✅ Pre-llenar los campos en el checkout si el cliente ya seleccionó ubicación
+
+---
+
 ## 🔐 Configuración de Credenciales Tramaco
 
 ### Paso 1: Acceder a la Configuración
@@ -58,14 +135,14 @@ Antes de instalar el plugin, asegúrate de tener:
 
 Completa los siguientes campos con los datos proporcionados por Tramaco:
 
-| Campo | Descripción | Ejemplo |
-|-------|-------------|---------|
-| **Login (RUC/Cédula)** | Tu número de RUC o cédula registrado | `1793191845001` |
-| **Contraseña API** | Contraseña proporcionada por Tramaco | `MiPassword123` |
-| **ID Usuario** | Identificador de usuario Tramaco | `8651` |
-| **ID Contrato** | Número de contrato con Tramaco | `6394` |
-| **ID Localidad Origen** | Código de tu localidad de envío | `21580` |
-| **ID Producto** | Tipo de servicio contratado | `36` |
+| Campo                   | Descripción                          | Ejemplo         |
+| ----------------------- | ------------------------------------ | --------------- |
+| **Login (RUC/Cédula)**  | Tu número de RUC o cédula registrado | `1793191845001` |
+| **Contraseña API**      | Contraseña proporcionada por Tramaco | `MiPassword123` |
+| **ID Usuario**          | Identificador de usuario Tramaco     | `8651`          |
+| **ID Contrato**         | Número de contrato con Tramaco       | `6394`          |
+| **ID Localidad Origen** | Código de tu localidad de envío      | `21580`         |
+| **ID Producto**         | Tipo de servicio contratado          | `36`            |
 
 ### Paso 3: Seleccionar Ambiente
 
@@ -100,12 +177,12 @@ Clic en **"Guardar cambios"** y verifica que aparezca el mensaje de confirmació
 
 Clic en "Editar" junto al método Tramaco y configura:
 
-| Opción | Descripción | Recomendación |
-|--------|-------------|---------------|
-| **Título** | Nombre que verán los clientes | "Envío Tramaco" |
-| **Habilitar cálculo automático** | Calcula precio según peso y destino | ✅ Activar |
-| **Margen adicional** | Porcentaje extra sobre el costo | 0-10% |
-| **Peso por defecto** | Si producto no tiene peso | 1 kg |
+| Opción                           | Descripción                         | Recomendación   |
+| -------------------------------- | ----------------------------------- | --------------- |
+| **Título**                       | Nombre que verán los clientes       | "Envío Tramaco" |
+| **Habilitar cálculo automático** | Calcula precio según peso y destino | ✅ Activar      |
+| **Margen adicional**             | Porcentaje extra sobre el costo     | 0-10%           |
+| **Peso por defecto**             | Si producto no tiene peso           | 1 kg            |
 
 ---
 
@@ -146,8 +223,8 @@ Si deseas enviar automáticamente los datos de cada guía a un Excel en SharePoi
 1. Crea un archivo Excel en SharePoint
 2. Crea una tabla con estas columnas:
    ```
-   Fecha | Hora | Pedido | Estado | Total | Guía | Fecha Guía | 
-   Destinatario | Teléfono | Email | Dirección | Ciudad | Parroquia | 
+   Fecha | Hora | Pedido | Estado | Total | Guía | Fecha Guía |
+   Destinatario | Teléfono | Email | Dirección | Ciudad | Parroquia |
    Productos | Cantidad | Costo Envío | PDF Guía | Link Pedido | Tracking
    ```
 3. Nombra la tabla como "TablaPedidos"
@@ -217,26 +294,31 @@ Cliente hace pedido → Selecciona Tramaco como envío → Pago completado
 ## ❗ Solución de Problemas
 
 ### Error: "No se pudo autenticar"
+
 - Verifica que las credenciales sean correctas
 - Confirma que el ambiente seleccionado coincide con tus credenciales
 - Contacta a Tramaco si las credenciales son nuevas
 
 ### Error: "No se pudo generar la guía"
+
 - Verifica que todos los datos del cliente estén completos
 - El RUC/Cédula del remitente debe ser válido
 - Verifica que el contrato esté activo
 
 ### El costo de envío no aparece
+
 - Verifica que la zona de envío incluya Ecuador
 - Asegúrate de que el método Tramaco esté habilitado
 - Los productos deben tener peso asignado
 
 ### Error de SharePoint
+
 - Verifica los permisos de la aplicación Azure AD
 - Confirma que el archivo Excel existe y tiene la tabla correcta
 - Revisa que los IDs de Site, Drive e Item sean correctos
 
 ### El PDF no se genera
+
 - Verifica que el número de guía sea válido
 - La guía debe existir en el sistema Tramaco
 - En ambiente QA, algunas guías de prueba pueden no generar PDF
@@ -246,11 +328,13 @@ Cliente hace pedido → Selecciona Tramaco como envío → Pago completado
 ## 📞 Soporte
 
 ### Tramaco
+
 - **Teléfono**: (02) 299-0000
 - **Email**: soporte@tramaco.com.ec
 - **Web**: https://www.tramaco.com.ec
 
 ### Plugin
+
 - Revisa los logs en **WooCommerce → Estado → Logs**
 - Busca archivos que empiecen con "tramaco-"
 
@@ -265,5 +349,5 @@ Cliente hace pedido → Selecciona Tramaco como envío → Pago completado
 
 ---
 
-*Última actualización: Enero 2026*
-*Versión del plugin: 1.1.0*
+_Última actualización: Enero 2026_
+_Versión del plugin: 1.1.0_

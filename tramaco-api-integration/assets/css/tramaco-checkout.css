@@ -313,10 +313,25 @@
   transition: all 0.2s ease;
   cursor: pointer;
   appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding-right: 35px;
+  /* Asegurar que el texto no se corte */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+/* Asegurar altura y visibilidad del texto en los options */
+.tramaco-cart-field select option {
+  padding: 10px;
+  white-space: normal;
+  word-wrap: break-word;
 }
 
 .tramaco-cart-field select:hover {
@@ -452,6 +467,93 @@
 /* Storefront */
 .storefront .tramaco-cart-location-selector {
   border-radius: 0;
+}
+
+/* ============================================================
+   WooCommerce Blocks - Compatibilidad específica
+   ============================================================ */
+
+/* Asegurar que el selector se muestre correctamente en Blocks */
+.wp-block-woocommerce-cart .tramaco-cart-location-selector,
+.wc-block-cart .tramaco-cart-location-selector {
+  margin: 20px 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Selectores dentro de Blocks */
+.wp-block-woocommerce-cart .tramaco-cart-field select,
+.wc-block-cart .tramaco-cart-field select {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0;
+  font-size: 14px !important;
+  padding: 12px 40px 12px 14px !important;
+  height: auto !important;
+  line-height: 1.4 !important;
+  background-color: #fff !important;
+  border: 1px solid #8c8f94 !important;
+  border-radius: 4px !important;
+  color: #2c3338 !important;
+}
+
+/* Asegurar visibilidad del texto seleccionado */
+.tramaco-cart-field select,
+.tramaco-select {
+  text-overflow: ellipsis !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+}
+
+/* Grid responsivo mejorado para Blocks */
+.wp-block-woocommerce-cart .tramaco-cart-location-fields,
+.wc-block-cart .tramaco-cart-location-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+@media (min-width: 600px) {
+  .wp-block-woocommerce-cart .tramaco-cart-location-fields,
+  .wc-block-cart .tramaco-cart-location-fields {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Fix para el contenedor principal en Blocks */
+.wc-block-cart__sidebar .tramaco-cart-location-selector {
+  order: -1;
+}
+
+/* Asegurar que los labels sean visibles */
+.tramaco-cart-field label {
+  display: block !important;
+  visibility: visible !important;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1e1e1e;
+}
+
+/* Mensajes de advertencia y resultado */
+.tramaco-cart-warning,
+.tramaco-cart-error,
+.tramaco-cart-shipping-result {
+  margin-top: 16px;
+  border-radius: 4px;
+}
+
+/* Spinner de carga */
+.tramaco-cart-calculating .spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #0073aa;
+  border-radius: 50%;
+  animation: tramaco-spin 1s linear infinite;
+  margin-right: 8px;
 }
 
 /* Flatsome */
