@@ -706,8 +706,17 @@ class Tramaco_WooCommerce_Integration {
             <!-- Mensaje de error -->
             <div class="tramaco-cart-error" id="tramaco-cart-error" style="display:none;"></div>
             
+            <!-- Mensaje de ubicación confirmada (cuando ya se calculó) -->
+            <div class="tramaco-location-confirmed" id="tramaco-location-confirmed" <?php echo ($saved_parroquia && $saved_shipping_cost) ? '' : 'style="display:none;"'; ?>>
+                <span class="check-icon">✅</span>
+                <div class="confirmed-text">
+                    <strong><?php _e('¡Envío aplicado correctamente!', 'tramaco-api'); ?></strong>
+                    <span><?php _e('Puedes proceder al pago o modificar tu ubicación si lo necesitas.', 'tramaco-api'); ?></span>
+                </div>
+            </div>
+            
             <!-- Mensaje de advertencia si no hay ubicación -->
-            <div class="tramaco-cart-warning" id="tramaco-cart-warning" <?php echo $saved_parroquia ? 'style="display:none;"' : ''; ?>>
+            <div class="tramaco-cart-warning" id="tramaco-cart-warning" <?php echo ($saved_parroquia && $saved_shipping_cost) ? 'style="display:none;"' : ''; ?>>
                 <span class="warning-icon">⚠️</span>
                 <?php _e('Debes seleccionar tu ubicación para calcular el envío antes de continuar al checkout.', 'tramaco-api'); ?>
             </div>

@@ -26,6 +26,8 @@
       return;
     }
 
+    console.log("Tramaco: Cargando ubicaciones desde API...");
+    
     $.ajax({
       url: tramacoApi.ajaxUrl,
       type: "POST",
@@ -33,13 +35,17 @@
         action: "tramaco_ubicaciones",
       },
       success: function (response) {
+        console.log("Tramaco: Respuesta de ubicaciones:", response);
         if (response.success && response.data) {
           ubicaciones = response.data;
+          console.log("Tramaco: Ubicaciones cargadas correctamente");
           callback(ubicaciones);
+        } else {
+          console.error("Tramaco: Error en respuesta de ubicaciones", response);
         }
       },
-      error: function () {
-        console.error("Error al cargar ubicaciones");
+      error: function (xhr, status, error) {
+        console.error("Tramaco: Error al cargar ubicaciones:", error);
       },
     });
   }
@@ -52,16 +58,22 @@
       var $select = $(selectId);
       $select.empty().append('<option value="">Seleccione...</option>');
 
-      if (data.provincias) {
-        $.each(data.provincias, function (i, provincia) {
+      // Manejar ambas estructuras de datos: data.provincias o data.lstProvincia
+      var provincias = data.provincias || data.lstProvincia || [];
+      
+      console.log("Tramaco: Poblando provincias, encontradas:", provincias.length);
+      
+      if (provincias.length > 0) {
+        $.each(provincias, function (i, provincia) {
+          var id = provincia.id || provincia.codigo;
+          var nombre = provincia.nombre;
           $select.append(
-            '<option value="' +
-              provincia.id +
-              '">' +
-              provincia.nombre +
-              "</option>"
+            '<option value="' + id + '">' + nombre + "</option>"
           );
         });
+        console.log("Tramaco: Provincias agregadas al select");
+      } else {
+        console.error("Tramaco: No se encontraron provincias en los datos");
       }
 
       // Refrescar select personalizado si existe
@@ -86,11 +98,17 @@
       return;
     }
 
-    $.each(ubicaciones.provincias, function (i, provincia) {
-      if (provincia.id == provinciaId && provincia.cantones) {
-        $.each(provincia.cantones, function (j, canton) {
+    // Manejar ambas estructuras de datos
+    var provincias = ubicaciones.provincias || ubicaciones.lstProvincia || [];
+    
+    $.each(provincias, function (i, provincia) {
+      var provId = provincia.id || provincia.codigo;
+      if (provId == provinciaId) {
+        var cantones = provincia.cantones || provincia.lstCanton || [];
+        $.each(cantones, function (j, canton) {
+          var cantonId = canton.id || canton.codigo;
           $select.append(
-            '<option value="' + canton.id + '">' + canton.nombre + "</option>"
+            '<option value="' + cantonId + '">' + canton.nombre + "</option>"
           );
         });
       }
@@ -117,17 +135,21 @@
       return;
     }
 
-    $.each(ubicaciones.provincias, function (i, provincia) {
-      if (provincia.id == provinciaId && provincia.cantones) {
-        $.each(provincia.cantones, function (j, canton) {
-          if (canton.id == cantonId && canton.parroquias) {
-            $.each(canton.parroquias, function (k, parroquia) {
+    // Manejar ambas estructuras de datos
+    var provincias = ubicaciones.provincias || ubicaciones.lstProvincia || [];
+    
+    $.each(provincias, function (i, provincia) {
+      var provId = provincia.id || provincia.codigo;
+      if (provId == provinciaId) {
+        var cantones = provincia.cantones || provincia.lstCanton || [];
+        $.each(cantones, function (j, canton) {
+          var cantId = canton.id || canton.codigo;
+          if (cantId == cantonId) {
+            var parroquias = canton.parroquias || canton.lstParroquia || [];
+            $.each(parroquias, function (k, parroquia) {
+              var parroquiaId = parroquia.id || parroquia.codigo;
               $select.append(
-                '<option value="' +
-                  parroquia.id +
-                  '">' +
-                  parroquia.nombre +
-                  "</option>"
+                '<option value="' + parroquiaId + '">' + parroquia.nombre + "</option>"
               );
             });
           }
@@ -510,7 +532,12 @@
     var $cantonSelect = $("#cotizacion-canton");
     var $parroquiaSelect = $("#cotizacion-parroquia");
 
-    if ($provinciaSelect.length === 0) return;
+    if ($provinciaSelect.length === 0) {
+      console.log("Tramaco Cotización: No se encontró el formulario de cotización");
+      return;
+    }
+    
+    console.log("Tramaco Cotización: Inicializando formulario...");
 
     // Cargar provincias
     populateProvincias("#cotizacion-provincia");
@@ -518,6 +545,7 @@
     // Evento cambio de provincia
     $provinciaSelect.on("change", function () {
       var provinciaId = $(this).val();
+      console.log("Tramaco Cotización: Provincia seleccionada:", provinciaId);
       populateCantones(provinciaId, "#cotizacion-canton");
       $parroquiaSelect
         .empty()
@@ -528,6 +556,7 @@
     $cantonSelect.on("change", function () {
       var provinciaId = $provinciaSelect.val();
       var cantonId = $(this).val();
+      console.log("Tramaco Cotización: Cantón seleccionado:", cantonId);
       populateParroquias(provinciaId, cantonId, "#cotizacion-parroquia");
     });
 

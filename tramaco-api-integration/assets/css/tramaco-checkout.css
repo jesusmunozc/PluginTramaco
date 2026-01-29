@@ -255,33 +255,42 @@
 
 /* Contenedor principal */
 .tramaco-cart-location-selector {
-  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
 .tramaco-cart-location-selector h3 {
-  margin: 0 0 8px 0;
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tramaco-cart-location-selector h3::before {
+  content: '📍';
   font-size: 18px;
-  font-weight: 600;
-  color: #333;
 }
 
 .tramaco-cart-location-selector .description {
-  color: #666;
-  font-size: 14px;
-  margin: 0 0 20px 0;
+  color: #64748b;
+  font-size: 13px;
+  margin: 0 0 18px 0;
+  line-height: 1.4;
 }
 
-/* Grid de campos */
+/* Grid de campos - Layout vertical */
 .tramaco-cart-location-fields {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
-  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 16px;
 }
 
 /* Campos individuales */
@@ -291,40 +300,47 @@
 }
 
 .tramaco-cart-field label {
-  font-weight: 500;
-  font-size: 14px;
-  color: #444;
+  font-weight: 600;
+  font-size: 12px;
+  color: #475569;
   margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .tramaco-cart-field label abbr {
-  color: #e74c3c;
+  color: #ef4444;
   text-decoration: none;
   border: none;
+  font-weight: 700;
 }
 
 .tramaco-cart-field select {
   width: 100%;
-  padding: 12px 14px;
-  font-size: 14px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  padding: 10px 38px 10px 14px;
+  font-size: 13px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background-color: linear-gradient(to bottom, #ffffff, #fafbfc);
   background-color: #fff;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23475569' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
-  padding-right: 35px;
-  /* Asegurar que el texto no se corte */
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
+  /* Permitir texto completo */
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
   min-height: 44px;
   box-sizing: border-box;
+  font-weight: 600;
+  color: #374151;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  line-height: 1.3;
 }
 
 /* Asegurar altura y visibilidad del texto en los options */
@@ -335,13 +351,15 @@
 }
 
 .tramaco-cart-field select:hover {
-  border-color: #0073aa;
+  border-color: #94a3b8;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
 }
 
 .tramaco-cart-field select:focus {
   outline: none;
-  border-color: #0073aa;
-  box-shadow: 0 0 0 3px rgba(0, 115, 170, 0.15);
+  border-color: #3b82f6;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
 }
 
 .tramaco-cart-field select:disabled {
@@ -352,34 +370,76 @@
 
 /* Resultado del cálculo de envío */
 .tramaco-cart-shipping-result {
-  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-  border: 1px solid #4caf50;
-  border-radius: 6px;
-  padding: 15px 20px;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border: 1px solid #34d399;
+  border-left: 4px solid #10b981;
+  border-radius: 10px;
+  padding: 14px 18px;
   margin-top: 15px;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.1);
 }
 
 .tramaco-shipping-calculated {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .tramaco-shipping-icon {
-  font-size: 24px;
+  font-size: 22px;
 }
 
 .tramaco-shipping-label {
-  font-size: 15px;
-  color: #2e7d32;
+  font-size: 14px;
+  color: #065f46;
   font-weight: 500;
 }
 
 .tramaco-shipping-price {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
-  color: #1b5e20;
+  color: #047857;
+  margin-left: auto;
+}
+
+/* Mensaje de ubicación confirmada */
+.tramaco-location-confirmed {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border: 1px solid #34d399;
+  border-left: 4px solid #10b981;
+  border-radius: 10px;
+  color: #065f46;
+  font-size: 13px;
+  margin-top: 12px;
+  line-height: 1.4;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.1);
+}
+
+.tramaco-location-confirmed .check-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.tramaco-location-confirmed .confirmed-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tramaco-location-confirmed .confirmed-text strong {
+  color: #047857;
+  font-size: 14px;
+}
+
+.tramaco-location-confirmed .confirmed-text span {
+  color: #059669;
+  font-size: 12px;
 }
 
 /* Mensaje de cálculo en proceso */
@@ -419,25 +479,65 @@
 /* Mensaje de advertencia */
 .tramaco-cart-warning {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 15px;
-  background: #fff8e1;
-  border: 1px solid #ff9800;
-  border-radius: 6px;
-  color: #e65100;
-  font-size: 14px;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+  border: 1px solid #facc15;
+  border-left: 4px solid #eab308;
+  border-radius: 10px;
+  color: #854d0e;
+  font-size: 13px;
   margin-top: 15px;
+  line-height: 1.5;
+  box-shadow: 0 2px 4px rgba(234, 179, 8, 0.1);
 }
 
 .tramaco-cart-warning .warning-icon {
-  font-size: 20px;
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Overlay de aplicación de envío */
+.tramaco-applying-overlay {
+  position: relative;
+  padding: 16px;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1px solid #7dd3fc;
+  border-left: 4px solid #0ea5e9;
+  border-radius: 10px;
+  margin-top: 15px;
+  text-align: center;
+}
+
+.tramaco-applying-overlay .applying-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #0369a1;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.tramaco-applying-overlay .applying-spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #bae6fd;
+  border-top-color: #0284c7;
+  border-radius: 50%;
+  animation: tramaco-spin 0.8s linear infinite;
+}
+
+.tramaco-applying-overlay .applying-text {
+  color: #0c4a6e;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .tramaco-cart-location-fields {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 
   .tramaco-cart-field select {
@@ -498,27 +598,28 @@
   color: #2c3338 !important;
 }
 
-/* Asegurar visibilidad del texto seleccionado */
+/* Asegurar visibilidad del texto seleccionado completo */
 .tramaco-cart-field select,
 .tramaco-select {
-  text-overflow: ellipsis !important;
-  overflow: hidden !important;
-  white-space: nowrap !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
 }
 
-/* Grid responsivo mejorado para Blocks */
+/* Grid responsivo mejorado para Blocks - Layout vertical */
 .wp-block-woocommerce-cart .tramaco-cart-location-fields,
 .wc-block-cart .tramaco-cart-location-fields {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 14px;
 }
 
 @media (min-width: 600px) {
   .wp-block-woocommerce-cart .tramaco-cart-location-fields,
   .wc-block-cart .tramaco-cart-location-fields {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
   }
 }
 

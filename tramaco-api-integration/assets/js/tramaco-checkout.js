@@ -92,6 +92,11 @@
                 $("#tramaco_cart_parroquia").val(
                   tramacoCartData.savedParroquia,
                 );
+                
+                // Si hay parroquia guardada, mostrar mensaje de confirmación
+                // y ocultar advertencia
+                $("#tramaco-cart-warning").hide();
+                $("#tramaco-location-confirmed").show();
               }
             });
           }
@@ -124,6 +129,8 @@
       $("#tramaco-shipping-result").hide();
       $("#tramaco-cart-warning").show();
       $("#tramaco-cart-error").hide();
+      $("#tramaco-location-confirmed").hide();
+      $("#tramaco-applying-overlay").hide();
 
       if (!provinciaCode) {
         this.saveLocation("", "", "");
@@ -175,6 +182,8 @@
       // Ocultar resultado
       $("#tramaco-shipping-result").hide();
       $("#tramaco-cart-warning").show();
+      $("#tramaco-location-confirmed").hide();
+      $("#tramaco-applying-overlay").hide();
 
       if (!cantonCode || !provinciaCode) {
         this.saveLocation(provinciaCode, "", "");
@@ -226,6 +235,8 @@
       if (!parroquiaCode) {
         $("#tramaco-shipping-result").hide();
         $("#tramaco-cart-warning").show();
+        $("#tramaco-location-confirmed").hide();
+        $("#tramaco-applying-overlay").hide();
         return;
       }
 
@@ -264,6 +275,7 @@
       $("#tramaco-shipping-result").hide();
       $("#tramaco-cart-error").hide();
       $("#tramaco-cart-warning").hide();
+      $("#tramaco-location-confirmed").hide();
 
       $.ajax({
         url: tramacoCartData.ajaxUrl,
@@ -285,6 +297,13 @@
             // Mostrar resultado
             $("#tramaco-shipping-price").html(response.data.total_formatted);
             $("#tramaco-shipping-result").show();
+            
+            // Mostrar mensaje de confirmación en lugar de advertencia
+            $("#tramaco-cart-warning").hide();
+            $("#tramaco-location-confirmed").show();
+            
+            // Mostrar overlay de "aplicando envío"
+            self.showApplyingOverlay();
 
             // Actualizar totales del carrito
             $(document.body).trigger("wc_update_cart");
@@ -294,14 +313,33 @@
               response.data.message,
             );
             $("#tramaco-cart-error").text(response.data.message).show();
+            $("#tramaco-cart-warning").show();
           }
         },
         error: function (xhr, status, error) {
           $("#tramaco-calculating").hide();
           console.error("Tramaco Cart: Error AJAX:", error);
           $("#tramaco-cart-error").text(tramacoCartData.i18n.error).show();
+          $("#tramaco-cart-warning").show();
         },
       });
+    },
+    
+    showApplyingOverlay: function() {
+      // Crear overlay si no existe
+      if (!$("#tramaco-applying-overlay").length) {
+        var overlayHtml = '<div class="tramaco-applying-overlay" id="tramaco-applying-overlay">' +
+          '<div class="applying-content">' +
+          '<div class="applying-spinner"></div>' +
+          '<span class="applying-text">Aplicando envío al carrito...</span>' +
+          '</div></div>';
+        $("#tramaco-shipping-result").after(overlayHtml);
+      }
+      $("#tramaco-applying-overlay").show();
+    },
+    
+    hideApplyingOverlay: function() {
+      $("#tramaco-applying-overlay").hide();
     },
   };
 
@@ -707,6 +745,20 @@
   // Reinicializar carrito cuando se actualiza
   $(document).on("updated_wc_div wc_cart_updated", function () {
     console.log("Tramaco: Carrito actualizado, reinicializando...");
+    
+    // Ocultar overlay de aplicación
+    $("#tramaco-applying-overlay").hide();
+    
+    // Verificar si hay envío calculado (mirando si el resultado está visible o si hay precio)
+    var shippingCalculated = $("#tramaco-shipping-result").is(":visible") || 
+                              $("#tramaco-shipping-price").text().trim() !== "";
+    var hasParroquia = $("#tramaco_cart_parroquia").val() !== "";
+    
+    if (shippingCalculated && hasParroquia) {
+      $("#tramaco-cart-warning").hide();
+      $("#tramaco-location-confirmed").show();
+    }
+    
     if ($("#tramaco-cart-location").length > 0) {
       TramacoCart.init();
     }

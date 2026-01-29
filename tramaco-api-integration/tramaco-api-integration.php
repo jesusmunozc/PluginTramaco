@@ -80,6 +80,7 @@ class Tramaco_API_Integration {
         add_action('wp_ajax_tramaco_localidades', array($this, 'ajax_get_localidades'));
         add_action('wp_ajax_tramaco_save_checkout_parroquia', array($this, 'ajax_save_checkout_parroquia'));
         add_action('wp_ajax_nopriv_tramaco_save_checkout_parroquia', array($this, 'ajax_save_checkout_parroquia'));
+        add_action('wp_ajax_tramaco_clear_cache', array($this, 'ajax_clear_cache'));
     }
     
     public function init() {
@@ -311,6 +312,45 @@ class Tramaco_API_Integration {
                 <?php _e('Probar Autenticación', 'tramaco-api'); ?>
             </button>
             <div id="connection-result" style="margin-top: 10px;"></div>
+            
+            <hr>
+            
+            <h2><?php _e('Mantenimiento', 'tramaco-api'); ?></h2>
+            <p><?php _e('Si tienes problemas con los selectores de ubicación o la cotización, puedes limpiar el caché:', 'tramaco-api'); ?></p>
+            <button type="button" id="clear-cache" class="button button-secondary">
+                🗑️ <?php _e('Limpiar Caché de Ubicaciones', 'tramaco-api'); ?>
+            </button>
+            <div id="cache-result" style="margin-top: 10px;"></div>
+            
+            <script>
+            jQuery(document).ready(function($) {
+                $('#clear-cache').on('click', function() {
+                    var $btn = $(this);
+                    var $result = $('#cache-result');
+                    
+                    $btn.prop('disabled', true).text('Limpiando...');
+                    
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: { action: 'tramaco_clear_cache' },
+                        success: function(response) {
+                            if (response.success) {
+                                $result.html('<div class="notice notice-success"><p>✅ ' + response.data.message + '</p></div>');
+                            } else {
+                                $result.html('<div class="notice notice-error"><p>❌ Error al limpiar caché</p></div>');
+                            }
+                        },
+                        error: function() {
+                            $result.html('<div class="notice notice-error"><p>❌ Error de conexión</p></div>');
+                        },
+                        complete: function() {
+                            $btn.prop('disabled', false).html('🗑️ <?php _e('Limpiar Caché de Ubicaciones', 'tramaco-api'); ?>');
+                        }
+                    });
+                });
+            });
+            </script>
             
             <hr>
             
@@ -1078,6 +1118,21 @@ class Tramaco_API_Integration {
             'success' => isset($body['codigo']) && $body['codigo'] == 1,
             'data' => $body
         );
+    }
+    
+    /**
+     * AJAX: Limpiar cache de ubicaciones y token
+     */
+    public function ajax_clear_cache() {
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('No tienes permisos');
+            return;
+        }
+        
+        delete_transient('tramaco_api_token');
+        delete_transient('tramaco_ubicaciones');
+        
+        wp_send_json_success(array('message' => 'Cache limpiado correctamente'));
     }
     
     /**
