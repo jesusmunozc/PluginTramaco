@@ -1,0 +1,30 @@
+# Dependencies
+vendor/
+node_modules/
+
+# Composer
+composer.lock
+composer.phar
+
+# WordPress
+wp-config.php
+.htaccess
+
+# OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+error_log
+debug.log
+
+# Temporary files
+*.tmp
+*.bak
+*.cache

@@ -1,0 +1,673 @@
+/**
+ * Estilos para el checkout de WooCommerce con Tramaco
+ * 
+ * @package Tramaco_API_Integration
+ * @since 1.1.0
+ */
+
+/* Campos de ubicación Tramaco - Asegurar visibilidad */
+.tramaco-field {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+}
+
+.tramaco-field.hidden {
+  display: none !important;
+}
+
+.tramaco-ubicacion select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+  font-size: 14px;
+  line-height: 1.5;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+}
+
+.tramaco-ubicacion select:focus {
+  border-color: #0073aa;
+  outline: 0;
+  box-shadow: 0 0 0 2px rgba(0, 115, 170, 0.2);
+}
+
+.tramaco-ubicacion select:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* Método de envío Tramaco */
+.woocommerce-shipping-methods .shipping_method[value^="tramaco"] + label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.woocommerce-shipping-methods
+  .shipping_method[value^="tramaco"]
+  + label::before {
+  content: "🚚";
+  font-size: 1.2em;
+}
+
+/* Badge de envío gratis */
+.tramaco-free-shipping-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-left: 8px;
+}
+
+/* Mensaje de cálculo */
+.tramaco-shipping-calculating {
+  color: #666;
+  font-style: italic;
+  font-size: 13px;
+}
+
+.tramaco-shipping-calculating::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  border: 2px solid #ddd;
+  border-top-color: #0073aa;
+  border-radius: 50%;
+  animation: tramaco-spin 0.8s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes tramaco-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Info de envío */
+.tramaco-shipping-info {
+  background: #f8f9fa;
+  border-left: 3px solid #0073aa;
+  padding: 12px 15px;
+  margin: 15px 0;
+  font-size: 13px;
+}
+
+.tramaco-shipping-info .shipping-estimate {
+  color: #666;
+  margin-top: 5px;
+}
+
+.tramaco-shipping-info .shipping-estimate strong {
+  color: #333;
+}
+
+/* Campos requeridos */
+.tramaco-ubicacion.woocommerce-invalid select {
+  border-color: #dc3545;
+}
+
+.tramaco-ubicacion .woocommerce-error {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* Selects mejorados */
+#billing_tramaco_provincia_field,
+#billing_tramaco_canton_field,
+#billing_tramaco_parroquia_field,
+#shipping_tramaco_provincia_field,
+#shipping_tramaco_canton_field,
+#shipping_tramaco_parroquia_field {
+  margin-bottom: 15px;
+}
+
+#billing_tramaco_provincia_field label,
+#billing_tramaco_canton_field label,
+#billing_tramaco_parroquia_field label,
+#shipping_tramaco_provincia_field label,
+#shipping_tramaco_canton_field label,
+#shipping_tramaco_parroquia_field label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+#billing_tramaco_provincia_field label abbr,
+#billing_tramaco_canton_field label abbr,
+#billing_tramaco_parroquia_field label abbr,
+#shipping_tramaco_provincia_field label abbr,
+#shipping_tramaco_canton_field label abbr,
+#shipping_tramaco_parroquia_field label abbr {
+  color: #dc3545;
+  text-decoration: none;
+  border: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tramaco-ubicacion select {
+    font-size: 16px; /* Previene zoom en iOS */
+  }
+}
+
+/* Integración con temas populares */
+
+/* Storefront */
+.storefront .tramaco-ubicacion select {
+  border-radius: 0;
+}
+
+/* Flatsome */
+.flatsome .tramaco-ubicacion select {
+  border-radius: 0;
+  padding: 12px 15px;
+}
+
+/* Astra */
+.ast-woo-two-step-checkout .tramaco-ubicacion select,
+.astra-woocommerce-checkout .tramaco-ubicacion select {
+  border-radius: 2px;
+}
+
+/* OceanWP */
+.oceanwp-theme .tramaco-ubicacion select {
+  padding: 12px 15px;
+}
+
+/* Divi */
+.et_pb_wc_checkout_form .tramaco-ubicacion select {
+  padding: 16px !important;
+}
+
+/* Indicador de carga en los selects */
+.tramaco-ubicacion.loading select {
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23666"><circle cx="12" cy="12" r="3" opacity="0.3"><animate attributeName="opacity" values="0.3;1;0.3" dur="1s" repeatCount="indefinite"/></circle></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 20px;
+}
+
+/* Tooltip de ayuda */
+.tramaco-ubicacion .tooltip {
+  display: inline-block;
+  margin-left: 5px;
+  cursor: help;
+}
+
+.tramaco-ubicacion .tooltip::after {
+  content: "ℹ️";
+  font-size: 12px;
+}
+
+/* Meta box en admin */
+.tramaco-order-metabox {
+  padding: 10px 0;
+}
+
+.tramaco-order-metabox p {
+  margin: 0 0 10px;
+}
+
+.tramaco-order-metabox code {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #f0f0f0;
+  border-radius: 3px;
+  font-family: monospace;
+}
+
+.tramaco-order-metabox .button {
+  margin-right: 5px;
+  margin-top: 5px;
+}
+
+/* Columna de guía en lista de pedidos */
+.column-tramaco_guia {
+  width: 140px;
+}
+
+.column-tramaco_guia code {
+  font-size: 11px;
+  background: #e7f3ff;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.column-tramaco_guia a {
+  text-decoration: none;
+}
+
+/* ============================================================
+   CHECKOUT EN 2 PASOS - SELECTOR DE UBICACIÓN EN EL CARRITO
+   ============================================================ */
+
+/* Contenedor principal */
+.tramaco-cart-location-selector {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.tramaco-cart-location-selector h3 {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tramaco-cart-location-selector h3::before {
+  content: '📍';
+  font-size: 18px;
+}
+
+.tramaco-cart-location-selector .description {
+  color: #64748b;
+  font-size: 13px;
+  margin: 0 0 18px 0;
+  line-height: 1.4;
+}
+
+/* Grid de campos - Layout vertical */
+.tramaco-cart-location-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+/* Campos individuales */
+.tramaco-cart-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.tramaco-cart-field label {
+  font-weight: 600;
+  font-size: 12px;
+  color: #475569;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.tramaco-cart-field label abbr {
+  color: #ef4444;
+  text-decoration: none;
+  border: none;
+  font-weight: 700;
+}
+
+.tramaco-cart-field select {
+  width: 100%;
+  padding: 10px 38px 10px 14px;
+  font-size: 13px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background-color: linear-gradient(to bottom, #ffffff, #fafbfc);
+  background-color: #fff;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23475569' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  /* Permitir texto completo */
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  min-height: 44px;
+  box-sizing: border-box;
+  font-weight: 600;
+  color: #374151;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  line-height: 1.3;
+}
+
+/* Asegurar altura y visibilidad del texto en los options */
+.tramaco-cart-field select option {
+  padding: 10px;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.tramaco-cart-field select:hover {
+  border-color: #94a3b8;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.tramaco-cart-field select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.tramaco-cart-field select:disabled {
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* Resultado del cálculo de envío */
+.tramaco-cart-shipping-result {
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border: 1px solid #34d399;
+  border-left: 4px solid #10b981;
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-top: 15px;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.1);
+}
+
+.tramaco-shipping-calculated {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tramaco-shipping-icon {
+  font-size: 22px;
+}
+
+.tramaco-shipping-label {
+  font-size: 14px;
+  color: #065f46;
+  font-weight: 500;
+}
+
+.tramaco-shipping-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: #047857;
+  margin-left: auto;
+}
+
+/* Mensaje de ubicación confirmada */
+.tramaco-location-confirmed {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border: 1px solid #34d399;
+  border-left: 4px solid #10b981;
+  border-radius: 10px;
+  color: #065f46;
+  font-size: 13px;
+  margin-top: 12px;
+  line-height: 1.4;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.1);
+}
+
+.tramaco-location-confirmed .check-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.tramaco-location-confirmed .confirmed-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tramaco-location-confirmed .confirmed-text strong {
+  color: #047857;
+  font-size: 14px;
+}
+
+.tramaco-location-confirmed .confirmed-text span {
+  color: #059669;
+  font-size: 12px;
+}
+
+/* Mensaje de cálculo en proceso */
+.tramaco-cart-calculating {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px;
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 6px;
+  color: #856404;
+  font-size: 14px;
+  margin-top: 15px;
+}
+
+.tramaco-cart-calculating .spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ffc107;
+  border-top-color: #856404;
+  border-radius: 50%;
+  animation: tramaco-spin 0.8s linear infinite;
+}
+
+/* Mensaje de error */
+.tramaco-cart-error {
+  padding: 15px;
+  background: #ffebee;
+  border: 1px solid #f44336;
+  border-radius: 6px;
+  color: #c62828;
+  font-size: 14px;
+  margin-top: 15px;
+}
+
+/* Mensaje de advertencia */
+.tramaco-cart-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+  border: 1px solid #facc15;
+  border-left: 4px solid #eab308;
+  border-radius: 10px;
+  color: #854d0e;
+  font-size: 13px;
+  margin-top: 15px;
+  line-height: 1.5;
+  box-shadow: 0 2px 4px rgba(234, 179, 8, 0.1);
+}
+
+.tramaco-cart-warning .warning-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Overlay de aplicación de envío */
+.tramaco-applying-overlay {
+  position: relative;
+  padding: 16px;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1px solid #7dd3fc;
+  border-left: 4px solid #0ea5e9;
+  border-radius: 10px;
+  margin-top: 15px;
+  text-align: center;
+}
+
+.tramaco-applying-overlay .applying-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #0369a1;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.tramaco-applying-overlay .applying-spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #bae6fd;
+  border-top-color: #0284c7;
+  border-radius: 50%;
+  animation: tramaco-spin 0.8s linear infinite;
+}
+
+.tramaco-applying-overlay .applying-text {
+  color: #0c4a6e;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tramaco-cart-location-fields {
+    flex-direction: column;
+  }
+
+  .tramaco-cart-field select {
+    font-size: 16px; /* Previene zoom en iOS */
+    padding: 14px 16px;
+  }
+
+  .tramaco-cart-location-selector {
+    padding: 15px;
+  }
+
+  .tramaco-shipping-calculated {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Animación de carga en selects */
+.tramaco-cart-field select.loading {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 50 50'%3E%3Cpath fill='%230073aa' d='M25 5A20 20 0 1 0 45 25 20 20 0 0 0 25 5zm0 35A15 15 0 1 1 40 25 15 15 0 0 1 25 40z' opacity='0.3'/%3E%3Cpath fill='%230073aa' d='M25 5V10A15 15 0 0 1 40 25h5A20 20 0 0 0 25 5z'%3E%3CanimateTransform attributeName='transform' type='rotate' from='0 25 25' to='360 25 25' dur='0.8s' repeatCount='indefinite'/%3E%3C/path%3E%3C/svg%3E");
+  background-position: right 12px center;
+  background-size: 20px;
+}
+
+/* Temas populares - compatibilidad */
+
+/* Storefront */
+.storefront .tramaco-cart-location-selector {
+  border-radius: 0;
+}
+
+/* ============================================================
+   WooCommerce Blocks - Compatibilidad específica
+   ============================================================ */
+
+/* Asegurar que el selector se muestre correctamente en Blocks */
+.wp-block-woocommerce-cart .tramaco-cart-location-selector,
+.wc-block-cart .tramaco-cart-location-selector {
+  margin: 20px 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Selectores dentro de Blocks */
+.wp-block-woocommerce-cart .tramaco-cart-field select,
+.wc-block-cart .tramaco-cart-field select {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0;
+  font-size: 14px !important;
+  padding: 12px 40px 12px 14px !important;
+  height: auto !important;
+  line-height: 1.4 !important;
+  background-color: #fff !important;
+  border: 1px solid #8c8f94 !important;
+  border-radius: 4px !important;
+  color: #2c3338 !important;
+}
+
+/* Asegurar visibilidad del texto seleccionado completo */
+.tramaco-cart-field select,
+.tramaco-select {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+/* Grid responsivo mejorado para Blocks - Layout vertical */
+.wp-block-woocommerce-cart .tramaco-cart-location-fields,
+.wc-block-cart .tramaco-cart-location-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+@media (min-width: 600px) {
+  .wp-block-woocommerce-cart .tramaco-cart-location-fields,
+  .wc-block-cart .tramaco-cart-location-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+}
+
+/* Fix para el contenedor principal en Blocks */
+.wc-block-cart__sidebar .tramaco-cart-location-selector {
+  order: -1;
+}
+
+/* Asegurar que los labels sean visibles */
+.tramaco-cart-field label {
+  display: block !important;
+  visibility: visible !important;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1e1e1e;
+}
+
+/* Mensajes de advertencia y resultado */
+.tramaco-cart-warning,
+.tramaco-cart-error,
+.tramaco-cart-shipping-result {
+  margin-top: 16px;
+  border-radius: 4px;
+}
+
+/* Spinner de carga */
+.tramaco-cart-calculating .spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #0073aa;
+  border-radius: 50%;
+  animation: tramaco-spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+/* Flatsome */
+.flatsome .tramaco-cart-field select {
+  border-radius: 0;
+}
+
+/* Astra */
+.ast-separate-container .tramaco-cart-location-selector {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* OceanWP */
+.oceanwp-theme .tramaco-cart-location-selector {
+  border-radius: 3px;
+}

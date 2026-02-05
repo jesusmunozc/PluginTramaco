@@ -1,0 +1,14 @@
+{
+  "name": "starbrand/tramaco-api-integration",
+  "description": "Integración con API de Tramaco y SharePoint para WooCommerce",
+  "type": "wordpress-plugin",
+  "require": {
+    "php": ">=7.4",
+    "phpoffice/phpspreadsheet": "^1.29"
+  },
+  "autoload": {
+    "psr-4": {
+      "Tramaco\\": "includes/"
+    }
+  }
+}

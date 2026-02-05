@@ -1,0 +1,1224 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "V1",
+    "title": "Api",
+    "x-swagger-net-version": "8.4.12.001"
+  },
+  "host": "api.laarcourier.com:9727",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/admin/guias/diarias/{fecha}": {
+      "get": {
+        "tags": "Administrador",
+        "operationId": "Administrador_getClientesGuias",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/admin/guias/{fecha}": {
+      "get": {
+        "tags": "Administrador",
+        "operationId": "Administrador_getClientesGuiasFechas",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/ciudades": {
+      "get": {
+        "tags": "Ciudades",
+        "summary": "Lista de las Ciudades",
+        "operationId": "Ciudades_Getciudad",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "responses": "@{200=}"
+      }
+    },
+    "/ciudades/homologacion": {
+      "get": {
+        "tags": "Ciudades",
+        "operationId": "Ciudades_GetCiudadHomologacion",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "responses": "@{200=}"
+      }
+    },
+    "/ciudades/zonas": {
+      "get": {
+        "tags": "Ciudades",
+        "summary": "Lista de las zonas de las ciudades",
+        "operationId": "Ciudades_getCiudadesZonas",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "responses": "@{200=}"
+      }
+    },
+    "/cotizadores/tarifa/normal": {
+      "get": {
+        "tags": "Cotizadores",
+        "operationId": "Cotizadores_GetCotizadorTarifanormal",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      },
+      "post": {
+        "tags": "Cotizadores",
+        "operationId": "Cotizadores_GetCotizadorTarifanormalPost",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/cotizadores/tarifa/contado": {
+      "post": {
+        "tags": "Cotizadores",
+        "operationId": "Cotizadores_GetCotizadorTarifacontadoPost",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/cotizadores/producto": {
+      "get": {
+        "tags": "Cotizadores",
+        "operationId": "Cotizadores_GetProductoCotizado",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "responses": "@{200=}"
+      }
+    },
+    "/estados": {
+      "get": {
+        "tags": "Estados",
+        "summary": "Catalogo de los estado de las Guias",
+        "operationId": "Estados_getEstados",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/{id}": {
+      "get": {
+        "tags": "Guia",
+        "summary": "Consulta de datos de la Guía (Estado,Remitente,Destinatario,Novedades)",
+        "operationId": "Guia_GetId",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/v2/{id}": {
+      "get": {
+        "tags": "Guia",
+        "summary": "Consulta de datos de la Guía (Estado,Remitente,Destinatario,Novedades)",
+        "operationId": "Guia_getGuiaHistorico",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/v2/estados/{id}": {
+      "get": {
+        "tags": "Guia",
+        "summary": "Coordenadas de entrega y novedades",
+        "operationId": "Guia_getGuiaHistoricoCoordenadas",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/{guia}/tracking": {
+      "get": {
+        "tags": "Guia",
+        "summary": "Consulta el Tracking de la Guia",
+        "operationId": "Guia_getClienteTracking",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/{guia}/novedades": {
+      "get": {
+        "tags": "Guia",
+        "summary": "Consulta el Novedades de la Guia",
+        "operationId": "Guia_getClienteNovedades",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/{guia}/historicos": {
+      "get": {
+        "tags": "Guia",
+        "summary": "Historial de la guía",
+        "operationId": "Guia_getClienteHistorico",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias": {
+      "post": {
+        "tags": "Guia",
+        "summary": "Generación de guía con datos de destino",
+        "operationId": "Guia_IngresarGuia",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": " ",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/retorno": {
+      "post": {
+        "tags": "Guia",
+        "summary": "Generación de guía con datos de destino con retorno al origen",
+        "operationId": "Guia_IngresarGuiaRetorno",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/devolucion": {
+      "post": {
+        "tags": "Guia",
+        "summary": "Generación de la guía de devolución",
+        "operationId": "Guia_IngresarGuiaDevolucion",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/{codigoSucursal}": {
+      "post": {
+        "tags": "Guia",
+        "summary": "Generación de la guía  por codigo de sucursal con datos de destino",
+        "operationId": "Guia_IngresarGuiaCodigoSucursal",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "  ",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/{codigoSucursal}/retorno": {
+      "post": {
+        "tags": "Guia",
+        "summary": "Generación de guía con datos de destino con retorno al origen",
+        "operationId": "Guia_IngresarGuiaCodigoSucursalRetorno",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": " ",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/anular/{guia}": {
+      "delete": {
+        "tags": "Guia",
+        "summary": "Anulacion de guía",
+        "operationId": "Guia_anularGuias",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/contado": {
+      "post": {
+        "tags": "Guia",
+        "summary": "Generación de la guía con datos de  Origen y Destino",
+        "operationId": "Guia_IngresarGuiaContado",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": " ",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/contado/retorno": {
+      "post": {
+        "tags": "Guia",
+        "summary": "Generación de la guía con datos de  Origen y Destino con Retorno al destinatario",
+        "operationId": "Guia_IngresarGuiaContadoRetorno",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/datos/actualizar": {
+      "put": {
+        "tags": "Guia",
+        "summary": "Actualizar datos de destinatario y gestion",
+        "operationId": "Guia_SaveActualizacionDatosGuia",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/actualizar/destinatario": {
+      "put": {
+        "tags": "Guia",
+        "operationId": "Guia_ActualizacionDatosGuia",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/datos/actualizar/masivos": {
+      "put": {
+        "tags": "Guia",
+        "operationId": "Guia_SaveActualizacionDatosGuiaMasivo",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/datos/actualizar/peso": {
+      "put": {
+        "tags": "Guia",
+        "summary": "Cambio de cantidad y pesos de guías",
+        "operationId": "Guia_SaveActualizacionDatosPesoGuia",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/crear/masivo": {
+      "post": {
+        "tags": "Guia",
+        "summary": "Creación de guias masivo",
+        "operationId": "Guia_IngresarGuiaMasivo",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": " ",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/devoluciones": {
+      "post": {
+        "tags": "Guia",
+        "summary": "Generación de la guía con datos de  Origen y Destino para devoluciones de domicilio y centro de servicio",
+        "operationId": "Guia_RegistrarGuiaDevoluciones",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "   ",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/cedula/{cedula}": {
+      "get": {
+        "tags": "Guia",
+        "operationId": "Guia_GetGuiaHistoricoCed",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/contado/masivo": {
+      "post": {
+        "tags": "Guia",
+        "operationId": "Guia_MasivoIngGuiaContado",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": " ",
+        "responses": "@{200=}"
+      }
+    },
+    "/api/Guia": {
+      "post": {
+        "tags": "Guia",
+        "operationId": "Guia_Pdf",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": " ",
+        "responses": "@{200=}"
+      }
+    },
+    "/clientes/{guia}/guias": {
+      "get": {
+        "tags": "GuiaCliente",
+        "summary": "Consulta detallada de las Guias del Cliente",
+        "operationId": "GuiaCliente_getClienteGuia",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/clientes": {
+      "get": {
+        "tags": "GuiaCliente",
+        "summary": "Consulta de los datos del cliente",
+        "operationId": "GuiaCliente_getClienteId",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "responses": "@{200=}"
+      }
+    },
+    "/clientes/{guia}/tracking": {
+      "get": {
+        "tags": "GuiaCliente",
+        "summary": "Consulta del Tracking de la Guia",
+        "operationId": "GuiaCliente_getClienteTracking",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/clientes/{guia}/novedades": {
+      "get": {
+        "tags": "GuiaCliente",
+        "summary": "Consulta Novedades de la Guia",
+        "operationId": "GuiaCliente_getClienteNovedades",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/clientes/guias/{fechaIni}/{fechaFin}/{estado}/{limit}/{offset}": {
+      "get": {
+        "tags": "GuiaCliente",
+        "summary": "Consulta de las guias generadas",
+        "operationId": "GuiaCliente_getClienteGuiaFechas",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "    ",
+        "responses": "@{200=}"
+      }
+    },
+    "/clientes/{guia}/etiquetas": {
+      "get": {
+        "tags": "GuiaCliente",
+        "summary": "Consulta detallada de las Guias del Cliente",
+        "operationId": "GuiaCliente_getClienteEtiqueta",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/clientes/guias/{estado}": {
+      "get": {
+        "tags": "GuiaCliente",
+        "summary": "Lista de la guias generadas",
+        "operationId": "GuiaCliente_getclietesguias",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/clientes/sucursales": {
+      "get": {
+        "tags": "GuiaCliente",
+        "summary": "Consulta de las Sucurdales del Cliente",
+        "operationId": "GuiaCliente_getClientesSucursales",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "responses": "@{200=}"
+      },
+      "post": {
+        "tags": "GuiaCliente",
+        "summary": "Ingreso de nuevas sucursal",
+        "operationId": "GuiaCliente_postClientesSucursales",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/authenticate": {
+      "post": {
+        "tags": "Login",
+        "summary": "Recolecta los valores datos del usuario, para poder iniciar seccion",
+        "operationId": "Login_Authenticate",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/manifiestos/recolecciones/{fecha}": {
+      "get": {
+        "tags": "Manifiestos",
+        "summary": "",
+        "operationId": "Manifiestos_GetManifiestosRecoleccion",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/manifiestos/recolecciones/{fecha}/{sucursal}": {
+      "get": {
+        "tags": "Manifiestos",
+        "operationId": "Manifiestos_GetManifiestosRecoleccionSucursal",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": " ",
+        "responses": "@{200=}"
+      }
+    },
+    "/api/oficinas/getOficina/{id}": {
+      "get": {
+        "tags": "Oficinas",
+        "operationId": "Oficinas_getOficina",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/api/oficinas/getOficina/HM/{id}": {
+      "get": {
+        "tags": "Oficinas",
+        "operationId": "Oficinas_getOficinaHM",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/api/oficinas/crearOficina": {
+      "post": {
+        "tags": "Oficinas",
+        "operationId": "Oficinas_RegistrarOficina",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/api/oficinas/actualizaOficina": {
+      "put": {
+        "tags": "Oficinas",
+        "operationId": "Oficinas_ActualizaOficina",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": " ",
+        "responses": "@{200=}"
+      }
+    },
+    "/api/oficinas/desactivarOficina": {
+      "delete": {
+        "tags": "Oficinas",
+        "operationId": "Oficinas_DesactivarOficina",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/api/oficinas/getOficinas": {
+      "get": {
+        "tags": "Oficinas",
+        "operationId": "Oficinas_getOficinas",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "responses": "@{200=}"
+      }
+    },
+    "/api/oficinas/getOficinas/HM": {
+      "get": {
+        "tags": "Oficinas",
+        "operationId": "Oficinas_getOficinasHM",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "responses": "@{200=}"
+      }
+    },
+    "/api/oficinas/getOficinas/LaarCourier": {
+      "get": {
+        "tags": "Oficinas",
+        "operationId": "Oficinas_getOficinasLaarCourier",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "responses": "@{200=}"
+      }
+    },
+    "/api/oficinas/getEstados": {
+      "get": {
+        "tags": "Oficinas",
+        "operationId": "Oficinas_getEstados",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "responses": "@{200=}"
+      }
+    },
+    "/api/oficinas/getTipoCas": {
+      "get": {
+        "tags": "Oficinas",
+        "operationId": "Oficinas_getTipoCas",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "responses": "@{200=}"
+      }
+    },
+    "/api/oficinas/getTipoOficina": {
+      "get": {
+        "tags": "Oficinas",
+        "operationId": "Oficinas_getTipoOficina",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "responses": "@{200=}"
+      }
+    },
+    "/api/provincias": {
+      "get": {
+        "tags": "Oficinas",
+        "operationId": "Oficinas_getProvincias",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "responses": "@{200=}"
+      }
+    },
+    "/api/tipoImpresora": {
+      "get": {
+        "tags": "Oficinas",
+        "operationId": "Oficinas_getTipoImpresoras",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "responses": "@{200=}"
+      },
+      "put": {
+        "tags": "Oficinas",
+        "operationId": "Oficinas_putTipoImpresoras",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      },
+      "post": {
+        "tags": "Oficinas",
+        "operationId": "Oficinas_postTipoImpresoras",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/api/tipoImpresora/{id}": {
+      "get": {
+        "tags": "Oficinas",
+        "operationId": "Oficinas_getTipoId",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/api/Oficinas": {
+      "post": {
+        "tags": "Oficinas",
+        "operationId": "Oficinas_ObtenerHorarios",
+        "consumes": "application/json text/json text/html application/x-www-form-urlencoded application/xml",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/pdfs/{guia}/{sucursalIn}": {
+      "get": {
+        "tags": "Pdfs",
+        "operationId": "Pdfs_Pdf",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": " ",
+        "responses": "@{200=}"
+      }
+    },
+    "/pdfs/manifiestos/recolecciones/{fecha}": {
+      "get": {
+        "tags": "Pdfs",
+        "summary": "Manifiesto de Recoleccion PDF",
+        "operationId": "Pdfs_PdfManifiestoRecoleccion",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/pdfs/devoluciones/{guia}": {
+      "get": {
+        "tags": "Pdfs",
+        "operationId": "Pdfs_PdfDevolucion",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": "",
+        "responses": "@{200=}"
+      }
+    },
+    "/guias/pdfs/DescargarV2": {
+      "get": {
+        "tags": "Pdfs",
+        "operationId": "Pdfs_PdfDescargarV2",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "parameters": " ",
+        "responses": "@{200=}"
+      }
+    },
+    "/productos": {
+      "get": {
+        "tags": "Productos",
+        "summary": "Lista de los Productos",
+        "operationId": "Productos_GetProductos",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "responses": "@{200=}"
+      }
+    },
+    "/regionales": {
+      "get": {
+        "tags": "Regional",
+        "summary": "Lista de las Regionales",
+        "operationId": "Regional_Getregional",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "responses": "@{200=}"
+      }
+    },
+    "/zonas": {
+      "get": {
+        "tags": "Zona",
+        "summary": "Lista de las Zonas de Cobertura",
+        "operationId": "Zona_getZonas",
+        "consumes": "",
+        "produces": "application/json text/json text/html application/xml",
+        "responses": "@{200=}"
+      }
+    }
+  },
+  "definitions": {
+    "CotizadorTarifaNormal": {
+      "properties": {
+        "codigoServicio": "@{type=number; format=double}",
+        "codigoCiudadOrigen": "@{type=number; format=double}",
+        "codigoCiudadDestino": "@{type=number; format=double}",
+        "piezas": "@{type=number; format=double}",
+        "peso": "@{type=number; format=double}"
+      },
+      "xml": {
+        "name": "CotizadorTarifaNormal"
+      },
+      "type": "object"
+    },
+    "Guia": {
+      "properties": {
+        "destino": "@{$ref=#/definitions/Destino}",
+        "numeroGuia": "@{type=string}",
+        "tipoServicio": "@{type=string}",
+        "noPiezas": "@{type=integer; format=int32}",
+        "peso": "@{type=number; format=float}",
+        "valorDeclarado": "@{type=number; format=float}",
+        "contiene": "@{type=string}",
+        "tamanio": "@{type=string}",
+        "cod": "@{type=boolean; default=False}",
+        "costoflete": "@{type=number; format=float}",
+        "costoproducto": "@{type=number; format=float}",
+        "tipocobro": "@{type=number; format=float}",
+        "comentario": "@{type=string}",
+        "agendar": "@{type=boolean; default=False}",
+        "fechaPedido": "@{type=string; default=01/01/2020}",
+        "extras": "@{$ref=#/definitions/Extras}",
+        "retorno": "@{$ref=#/definitions/Retorno}",
+        "facturas": "@{items=; xml=; type=array}",
+        "productoCotizados": "@{$ref=#/definitions/ProductoCotizado}"
+      },
+      "xml": {
+        "name": "Guia"
+      },
+      "type": "object"
+    },
+    "Destino": {
+      "properties": {
+        "identificacionD": "@{type=string}",
+        "ciudadD": "@{type=string}",
+        "nombreD": "@{type=string}",
+        "direccion": "@{type=string}",
+        "referencia": "@{type=string}",
+        "numeroCasa": "@{type=string}",
+        "postal": "@{type=string}",
+        "telefono": "@{type=string}",
+        "celular": "@{type=string}",
+        "correo": "@{type=string}"
+      },
+      "xml": {
+        "name": "Destino"
+      },
+      "type": "object"
+    },
+    "Extras": {
+      "properties": {
+        "Campo1": "@{type=string}",
+        "Campo2": "@{type=string}",
+        "Campo3": "@{type=string}",
+        "Campo4": "@{type=string}",
+        "skuEntrega": "@{type=string}",
+        "serialRetiro": "@{type=string}",
+        "serialEntrega": "@{type=string}",
+        "smartCardEntrega": "@{type=string}"
+      },
+      "xml": {
+        "name": "Extras"
+      },
+      "type": "object"
+    },
+    "Retorno": {
+      "properties": {
+        "tipoServicio": "@{type=string}",
+        "noPiezas": "@{type=integer; format=int32}",
+        "peso": "@{type=number; format=float}",
+        "contiene": "@{type=string}",
+        "comentario": "@{type=string}",
+        "tamanio": "@{type=string}"
+      },
+      "xml": {
+        "name": "Retorno"
+      },
+      "type": "object"
+    },
+    "Facturas": {
+      "properties": {
+        "serie": "@{type=string}"
+      },
+      "xml": {
+        "name": "Facturas"
+      },
+      "type": "object"
+    },
+    "ProductoCotizado": {
+      "properties": {
+        "codigo": "@{type=string}",
+        "observacion": "@{type=string}"
+      },
+      "xml": {
+        "name": "ProductoCotizado"
+      },
+      "type": "object"
+    },
+    "GuiaContado": {
+      "properties": {
+        "origen": "@{$ref=#/definitions/Origen}",
+        "destino": "@{$ref=#/definitions/DestinoC}",
+        "numeroGuia": "@{type=string}",
+        "tipoServicio": "@{type=string}",
+        "noPiezas": "@{type=integer; format=int32}",
+        "peso": "@{type=number; format=float}",
+        "valorDeclarado": "@{type=number; format=float}",
+        "contiene": "@{type=string}",
+        "tamanio": "@{type=string}",
+        "cod": "@{type=boolean; default=False}",
+        "costoflete": "@{type=number; format=float}",
+        "costoproducto": "@{type=number; format=float}",
+        "tipocobro": "@{type=number; format=float}",
+        "comentario": "@{type=string}",
+        "fechaPedido": "@{type=string; default=01/01/2020}",
+        "retorno": "@{$ref=#/definitions/Retorno}",
+        "extras": "@{$ref=#/definitions/ExtrasC}",
+        "retiroOficina": "@{$ref=#/definitions/RetiroOficina}"
+      },
+      "xml": {
+        "name": "GuiaContado"
+      },
+      "type": "object"
+    },
+    "Origen": {
+      "properties": {
+        "identificacionO": "@{type=string}",
+        "ciudadO": "@{type=string}",
+        "nombreO": "@{type=string}",
+        "direccion": "@{type=string}",
+        "referencia": "@{type=string}",
+        "numeroCasa": "@{type=string}",
+        "postal": "@{type=string}",
+        "telefono": "@{type=string}",
+        "celular": "@{type=string}"
+      },
+      "xml": {
+        "name": "Origen"
+      },
+      "type": "object"
+    },
+    "DestinoC": {
+      "properties": {
+        "identificacionD": "@{type=string}",
+        "ciudadD": "@{type=string}",
+        "nombreD": "@{type=string}",
+        "direccion": "@{type=string}",
+        "referencia": "@{type=string}",
+        "numeroCasa": "@{type=string}",
+        "postal": "@{type=string}",
+        "telefono": "@{type=string}",
+        "celular": "@{type=string}",
+        "latitud": "@{type=string}",
+        "longitud": "@{type=string}"
+      },
+      "xml": {
+        "name": "DestinoC"
+      },
+      "type": "object"
+    },
+    "ExtrasC": {
+      "properties": {
+        "Campo1": "@{type=string}",
+        "Campo2": "@{type=string}",
+        "Campo3": "@{type=string}"
+      },
+      "xml": {
+        "name": "ExtrasC"
+      },
+      "type": "object"
+    },
+    "RetiroOficina": {
+      "properties": {
+        "isRetiro": "@{type=boolean}",
+        "idOficina": "@{type=integer; format=int32}"
+      },
+      "xml": {
+        "name": "RetiroOficina"
+      },
+      "type": "object"
+    },
+    "ActualizarDatos": {
+      "properties": {
+        "guia": "@{type=string}",
+        "destino": "@{$ref=#/definitions/DestinoActualizar}",
+        "autorizado": "@{$ref=#/definitions/Autorizado}"
+      },
+      "xml": {
+        "name": "ActualizarDatos"
+      },
+      "type": "object"
+    },
+    "DestinoActualizar": {
+      "properties": {
+        "ciudad": "@{type=number; format=double}",
+        "nombre": "@{type=string}",
+        "cedula": "@{type=string}",
+        "callePrincipal": "@{type=string}",
+        "numeracion": "@{type=string}",
+        "calleSecundaria": "@{type=string}",
+        "referencia": "@{type=string}",
+        "telefono": "@{type=string}",
+        "celular": "@{type=string}",
+        "observacion": "@{type=string}",
+        "correo": "@{type=string}"
+      },
+      "xml": {
+        "name": "DestinoActualizar"
+      },
+      "type": "object"
+    },
+    "Autorizado": {
+      "properties": {
+        "isDevolucion": "@{type=boolean}",
+        "nombre": "@{type=string}",
+        "observacion": "@{type=string}"
+      },
+      "xml": {
+        "name": "Autorizado"
+      },
+      "type": "object"
+    },
+    "ActualizarDestinatario": {
+      "properties": {
+        "guia": "@{type=string}",
+        "latitud": "@{type=string}",
+        "longitud": "@{type=string}"
+      },
+      "xml": {
+        "name": "ActualizarDestinatario"
+      },
+      "type": "object"
+    },
+    "Cantidad": {
+      "properties": {
+        "guia": "@{type=string}",
+        "peso": "@{type=number; format=double}",
+        "cantidad": "@{type=integer; format=int32}"
+      },
+      "xml": {
+        "name": "Cantidad"
+      },
+      "type": "object"
+    },
+    "Sucursal": {
+      "properties": {
+        "codigoCiudad": "@{description=codigo de ciudad; type=string}",
+        "zona": "@{type=string}",
+        "codigoPostal": "@{type=string}",
+        "coordenadaX": "@{type=string}",
+        "coordenadaY": "@{type=string}",
+        "nombreSucursal": "@{type=string}",
+        "direccion": "@{type=string}",
+        "referenciaDireccion": "@{type=string}",
+        "telefono1": "@{type=string}",
+        "telefono2": "@{type=string}",
+        "correo": "@{type=string}",
+        "nombreContacto": "@{type=string}"
+      },
+      "xml": {
+        "name": "Sucursal"
+      },
+      "type": "object"
+    },
+    "LoginRequest": {
+      "properties": {
+        "username": "@{type=string}",
+        "password": "@{type=string}"
+      },
+      "xml": {
+        "name": "LoginRequest"
+      },
+      "type": "object"
+    },
+    "OficinaData": {
+      "properties": {
+        "direccion": "@{type=string}",
+        "telefono": "@{type=string}",
+        "correo": "@{type=string}",
+        "representante": "@{type=string}",
+        "latitud": "@{type=string}",
+        "longitud": "@{type=string}",
+        "lunes": "@{type=boolean}",
+        "martes": "@{type=boolean}",
+        "miercoles": "@{type=boolean}",
+        "jueves": "@{type=boolean}",
+        "viernes": "@{type=boolean}",
+        "sabado": "@{type=boolean}",
+        "domingo": "@{type=boolean}",
+        "horario_apertura": "@{type=string}",
+        "horario_cierre": "@{type=string}",
+        "salida_almuerzo": "@{type=string}",
+        "retorno_almuerzo": "@{type=string}",
+        "sabado_inicio": "@{type=string}",
+        "sabado_cierre": "@{type=string}",
+        "domingo_inicio": "@{type=string}",
+        "domingo_cierre": "@{type=string}",
+        "retiro_oficina": "@{type=boolean}",
+        "recepcion_envios": "@{type=boolean}",
+        "venta": "@{type=boolean}",
+        "operacion": "@{type=boolean}",
+        "visible": "@{type=boolean}",
+        "fecha_creacion": "@{type=string; format=date-time}",
+        "activo": "@{type=boolean}",
+        "p32Id": "@{type=string}",
+        "p04Id": "@{type=string}",
+        "P94_IdTO": "@{type=integer; format=int32}",
+        "P94_IdTC": "@{type=integer; format=int32}",
+        "P94_IdEstado": "@{type=integer; format=int32}",
+        "nombre": "@{type=string}",
+        "codigo_postal": "@{type=string}",
+        "telefono1": "@{type=string}",
+        "documento": "@{type=string}",
+        "cedula": "@{type=string}",
+        "local": "@{type=string}",
+        "rotulo": "@{type=string}",
+        "ventanas": "@{type=string}",
+        "p22Id": "@{type=integer; format=int32}",
+        "usuario": "@{type=integer; format=int32}",
+        "fecha_renovacion": "@{type=string; format=date-time}",
+        "fecha_contrato": "@{type=string; format=date-time}",
+        "condicion_operativa": "@{type=string}",
+        "venta_nacional": "@{type=boolean}",
+        "venta_internacional": "@{type=boolean}",
+        "condicion_comercial": "@{type=string}",
+        "renovacion": "@{type=string}",
+        "P94_PorcComisionCOREContado": "@{type=string}",
+        "P94_PorcComisionCORECredito": "@{type=string}",
+        "P94_PorcComisionUPS": "@{type=string}",
+        "contrato": "@{type=boolean}",
+        "observacion": "@{type=string}",
+        "impresora": "@{type=string}",
+        "empresa": "@{type=string}",
+        "empresa1": "@{type=string}",
+        "nomUsuarioRec": "@{type=string}",
+        "P94_ValorMarca": "@{type=number; format=double}",
+        "P94_IdTipoImpresora": "@{type=integer; format=int32}",
+        "p94_EsVisibleTemu": "@{type=boolean}",
+        "p94_Cod": "@{type=boolean}"
+      },
+      "xml": {
+        "name": "OficinaData"
+      },
+      "type": "object"
+    },
+    "TipoImpresora": {
+      "properties": {
+        "P94_IdTipoImpresora": "@{type=integer; format=int32}",
+        "P94_Nombre": "@{type=string}",
+        "P94_Estado": "@{type=boolean}"
+      },
+      "xml": {
+        "name": "TipoImpresora"
+      },
+      "type": "object"
+    },
+    "P94_View_OficinasLaar": {
+      "properties": {
+        "id": "@{type=number; format=double}",
+        "direccion": "@{type=string}",
+        "telefono": "@{type=string}",
+        "correo": "@{type=string}",
+        "repesentante": "@{type=string}",
+        "latitud": "@{type=string}",
+        "longitud": "@{type=string}",
+        "lunes": "@{type=boolean}",
+        "martes": "@{type=boolean}",
+        "miercoles": "@{type=boolean}",
+        "jueves": "@{type=boolean}",
+        "viernes": "@{type=boolean}",
+        "sabado": "@{type=boolean}",
+        "domingo": "@{type=boolean}",
+        "horario_apertura": "@{type=string}",
+        "horario_cierre": "@{type=string}",
+        "salida_almuerzo": "@{type=string}",
+        "retorno_almuerzo": "@{type=string}",
+        "sabado_inicio": "@{type=string}",
+        "sabado_cierre": "@{type=string}",
+        "domingo_inicio": "@{type=string}",
+        "domingo_cierre": "@{type=string}",
+        "retiro_oficina": "@{type=boolean}",
+        "recepcion_envios": "@{type=boolean}",
+        "venta": "@{type=boolean}",
+        "operacion": "@{type=boolean}",
+        "visible": "@{type=boolean}",
+        "fecha_creacion": "@{type=string; format=date-time}",
+        "activo": "@{type=boolean}",
+        "provincia": "@{type=string}",
+        "ciudad": "@{type=string}",
+        "id_provincia": "@{type=string}",
+        "id_ciudad": "@{type=number; format=double}",
+        "P94_IdTO": "@{type=number; format=double}",
+        "P94_IdTC": "@{type=number; format=double}",
+        "P94_IdEstado": "@{type=number; format=double}",
+        "nombre": "@{type=string}",
+        "codigo_postal": "@{type=string}",
+        "telefono1": "@{type=string}",
+        "documento": "@{type=string}",
+        "local": "@{type=string}",
+        "roulo": "@{type=string}",
+        "ventanas": "@{type=string}",
+        "usuarioRec": "@{type=integer; format=int32}",
+        "usuario": "@{type=number; format=double}",
+        "fecha_renovacion": "@{type=string; format=date-time}",
+        "fecha_contrato": "@{type=string; format=date-time}",
+        "condicion": "@{type=string}",
+        "venta_nacional": "@{type=boolean}",
+        "venta_internacional": "@{type=boolean}",
+        "condicion_comercial": "@{type=string}",
+        "renovacion": "@{type=string}",
+        "P94_PorcComisionCOREContado": "@{type=string}",
+        "P94_PorcComisionCORECredito": "@{type=string}",
+        "P94_PorcComisionUPS": "@{type=string}",
+        "contrato": "@{type=boolean}",
+        "observacion": "@{type=string}",
+        "impresora": "@{type=string}",
+        "empresa": "@{type=string}",
+        "empresa1": "@{type=string}",
+        "nomUsuarioRec": "@{type=string}",
+        "cedula": "@{type=string}",
+        "P94_TipoOficina": "@{type=string}",
+        "P94_Estado": "@{type=string}",
+        "P94_TipoCAS": "@{type=string}",
+        "P94_CodOficina": "@{type=string}",
+        "P94_IdTipoImpresora": "@{type=integer; format=int32}",
+        "TipoImpresora": "@{type=string}",
+        "P94_ValorMarca": "@{type=number; format=double}",
+        "P94_EsVisibleTemu": "@{type=boolean}",
+        "P94_Cod": "@{type=boolean}"
+      },
+      "xml": {
+        "name": "P94_View_OficinasLaar"
+      },
+      "type": "object"
+    },
+    "HorarioResult": {
+      "properties": {
+        "idOficina": "@{type=number; format=double}",
+        "descHorario": "@{type=string}"
+      },
+      "xml": {
+        "name": "HorarioResult"
+      },
+      "type": "object"
+    }
+  },
+  "tags": [
+    {
+      "name": "Administrador",
+      "description": "No Documentation Found."
+    },
+    {
+      "name": "Ciudades",
+      "description": "Catalogo de las ciudades"
+    },
+    {
+      "name": "Cotizadores",
+      "description": "No Documentation Found."
+    },
+    {
+      "name": "Estados",
+      "description": "Estados de la Guias"
+    },
+    {
+      "name": "Guia",
+      "description": "Gestion de Guias"
+    },
+    {
+      "name": "GuiaCliente",
+      "description": "Clientes"
+    },
+    {
+      "name": "Login",
+      "description": "Recolecta los valores datos del usuario, para poder iniciar seccion"
+    },
+    {
+      "name": "Manifiestos",
+      "description": "Manifiestos"
+    },
+    {
+      "name": "Oficinas",
+      "description": "Gestion de Oficinas"
+    },
+    {
+      "name": "Pdfs",
+      "description": "No Documentation Found."
+    },
+    {
+      "name": "Productos",
+      "description": "Productos"
+    },
+    {
+      "name": "Regional",
+      "description": "Catalogo de las regionales"
+    },
+    {
+      "name": "Zona",
+      "description": "Lista de las Zonas de Cobertura"
+    }
+  ]
+}

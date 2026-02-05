@@ -1,0 +1,535 @@
+/**
+ * Tramaco API Integration - Paleta de Colores Profesional
+ * Inspirada en diseño natural y elegante
+ */
+
+:root {
+  /* Paleta Principal - Tonos Tierra y Verde Oliva */
+  --tramaco-primary: #6b7547; /* Verde oliva principal */
+  --tramaco-primary-dark: #4a5230; /* Verde oliva oscuro */
+  --tramaco-primary-light: #8fa05e; /* Verde oliva claro */
+
+  --tramaco-secondary: #c9b896; /* Beige/crema */
+  --tramaco-secondary-dark: #a89770;
+  --tramaco-secondary-light: #e5dcca;
+
+  --tramaco-accent: #8b6f47; /* Marrón cálido */
+  --tramaco-accent-light: #b8956a;
+
+  /* Estados */
+  --tramaco-success: #7fa655; /* Verde natural */
+  --tramaco-warning: #d4a574; /* Naranja tierra */
+  --tramaco-danger: #c17e70; /* Rojo terracota */
+  --tramaco-info: #8fa3b5; /* Azul grisáceo */
+
+  /* Neutros */
+  --tramaco-white: #ffffff;
+  --tramaco-cream: #faf8f3; /* Crema muy claro */
+  --tramaco-light: #f5f1e8; /* Beige muy claro */
+  --tramaco-light-gray: #e8e4d9;
+  --tramaco-gray: #9b8e7e;
+  --tramaco-dark-gray: #5c5347;
+  --tramaco-dark: #3a352d;
+
+  /* Bordes y sombras */
+  --tramaco-border: #d8d3c5;
+  --tramaco-shadow: 0 4px 12px rgba(90, 75, 60, 0.08);
+  --tramaco-shadow-lg: 0 8px 24px rgba(90, 75, 60, 0.12);
+}
+
+/* Reset y Base */
+.tramaco-tracking-wrapper,
+.tramaco-cotizacion-form,
+.tramaco-generar-guia-form {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", sans-serif;
+  color: var(--tramaco-dark);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Contenedor principal */
+.tramaco-tracking-wrapper,
+.tramaco-cotizacion-wrapper,
+.tramaco-generar-guia-wrapper {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+
+/* Header Profesional */
+.tramaco-header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 40px 20px;
+  background: linear-gradient(
+    135deg,
+    var(--tramaco-primary) 0%,
+    var(--tramaco-primary-light) 100%
+  );
+  border-radius: 16px;
+  color: var(--tramaco-white);
+  box-shadow: var(--tramaco-shadow-lg);
+}
+
+.tramaco-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.tramaco-title-icon {
+  font-size: 40px;
+}
+
+.tramaco-subtitle {
+  font-size: 16px;
+  opacity: 0.95;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Card Container */
+.tramaco-card {
+  background: var(--tramaco-white);
+  border-radius: 16px;
+  padding: 35px;
+  box-shadow: var(--tramaco-shadow);
+  margin-bottom: 25px;
+  border: 1px solid var(--tramaco-border);
+}
+
+/* Sección con título */
+.tramaco-section {
+  margin-bottom: 30px;
+}
+
+.tramaco-section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--tramaco-primary);
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--tramaco-light);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-icon {
+  font-size: 22px;
+}
+
+/* Form Groups */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 768px) {
+  .form-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .form-row.row-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .form-group.full-width {
+    grid-column: 1 / -1;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--tramaco-dark);
+  font-size: 14px;
+}
+
+.label-icon {
+  font-size: 16px;
+  color: var(--tramaco-primary);
+}
+
+/* Inputs y Selects - MEJORADOS */
+.form-control,
+.form-control-lg,
+.form-select {
+  width: 100%;
+  padding: 14px 50px 14px 16px;
+  border: 2px solid var(--tramaco-border);
+  border-radius: 10px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #2d2d2d !important;
+  background: var(--tramaco-white);
+  transition: all 0.3s ease;
+  font-weight: 600;
+  box-sizing: border-box;
+  font-family: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.form-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%232d2d2d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 22px;
+  padding-right: 50px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.form-select option {
+  padding: 14px 16px;
+  color: #2d2d2d !important;
+  background: white;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1.6;
+  white-space: normal;
+}
+
+.form-select:focus,
+.form-control:focus {
+  outline: none;
+  border-color: var(--tramaco-primary);
+  box-shadow: 0 0 0 4px rgba(107, 117, 71, 0.15);
+}
+
+select::-ms-expand {
+  display: none;
+}
+
+.form-select option:hover,
+.form-select option:checked {
+  background: var(--tramaco-light);
+}
+
+.form-control-lg {
+  padding: 16px 18px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+textarea.form-control {
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.form-control:focus,
+.form-control-lg:focus,
+.form-select:focus {
+  outline: none;
+  border-color: var(--tramaco-primary);
+  box-shadow: 0 0 0 4px rgba(107, 117, 71, 0.1);
+  background: var(--tramaco-cream);
+}
+
+.form-text {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--tramaco-gray);
+  line-height: 1.4;
+}
+
+/* Sección destacada (verificación) */
+.form-row-verification {
+  background: linear-gradient(
+    135deg,
+    var(--tramaco-cream) 0%,
+    var(--tramaco-light) 100%
+  );
+  padding: 25px;
+  border-radius: 12px;
+  border: 2px solid var(--tramaco-secondary-light);
+  position: relative;
+  overflow: hidden;
+}
+
+.form-row-verification::before {
+  content: "🔒";
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  font-size: 48px;
+  opacity: 0.1;
+}
+
+/* Botones Profesionales */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 32px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  font-family: inherit;
+  box-shadow: var(--tramaco-shadow);
+}
+
+.btn-primary {
+  background: linear-gradient(
+    135deg,
+    var(--tramaco-primary) 0%,
+    var(--tramaco-primary-light) 100%
+  );
+  color: var(--tramaco-white);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(
+    135deg,
+    var(--tramaco-primary-dark) 0%,
+    var(--tramaco-primary) 100%
+  );
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(107, 117, 71, 0.3);
+}
+
+.btn-secondary {
+  background: var(--tramaco-secondary);
+  color: var(--tramaco-dark);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--tramaco-secondary-dark);
+  transform: translateY(-2px);
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-lg {
+  padding: 18px 40px;
+  font-size: 17px;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-icon {
+  font-size: 20px;
+}
+
+/* Spinner */
+.btn-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Resultados y Mensajes */
+.tramaco-result {
+  display: none;
+  margin-top: 30px;
+}
+
+.tramaco-result.show {
+  display: block;
+  animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tramaco-result.error,
+.tramaco-result.error-verification {
+  background: linear-gradient(135deg, #ffe5e5 0%, #ffd5d5 100%);
+  border: 2px solid var(--tramaco-danger);
+  border-radius: 12px;
+  padding: 20px 25px;
+  color: #8b0000;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-weight: 500;
+}
+
+.tramaco-result.error::before {
+  content: "⚠️";
+  font-size: 28px;
+}
+
+.tramaco-result.success {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border: 2px solid var(--tramaco-success);
+  border-radius: 12px;
+  padding: 20px 25px;
+  color: #2e7d32;
+}
+
+.tramaco-result.info {
+  background: var(--tramaco-white);
+  border-radius: 12px;
+  padding: 0;
+}
+
+/* Cotización Result */
+.cotizacion-result-card {
+  background: linear-gradient(
+    135deg,
+    var(--tramaco-cream) 0%,
+    var(--tramaco-white) 100%
+  );
+  border-radius: 16px;
+  padding: 30px;
+  border: 2px solid var(--tramaco-primary);
+  box-shadow: var(--tramaco-shadow-lg);
+}
+
+.cotizacion-price {
+  text-align: center;
+  padding: 25px;
+  background: linear-gradient(
+    135deg,
+    var(--tramaco-primary) 0%,
+    var(--tramaco-primary-light) 100%
+  );
+  border-radius: 12px;
+  color: var(--tramaco-white);
+  margin-bottom: 25px;
+}
+
+.price-label {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.price-value {
+  font-size: 48px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.price-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.price-detail-item {
+  background: var(--tramaco-white);
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  border: 1px solid var(--tramaco-border);
+}
+
+.detail-label {
+  font-size: 12px;
+  color: var(--tramaco-gray);
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.detail-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--tramaco-primary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tramaco-title {
+    font-size: 24px;
+  }
+
+  .tramaco-card {
+    padding: 25px 20px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .price-value {
+    font-size: 36px;
+  }
+}
+
+/* Utility classes */
+.text-center {
+  text-align: center;
+}
+
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+.mb-1 {
+  margin-bottom: 10px !important;
+}
+.mb-2 {
+  margin-bottom: 20px !important;
+}
+.mb-3 {
+  margin-bottom: 30px !important;
+}
+
+.mt-0 {
+  margin-top: 0 !important;
+}
+.mt-1 {
+  margin-top: 10px !important;
+}
+.mt-2 {
+  margin-top: 20px !important;
+}
+.mt-3 {
+  margin-top: 30px !important;
+}
