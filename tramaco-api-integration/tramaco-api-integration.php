@@ -89,6 +89,7 @@ class Tramaco_API_Integration {
         // AJAX handlers para SharePoint
         add_action('wp_ajax_tramaco_sharepoint_test', array($this, 'ajax_sharepoint_test'));
         add_action('wp_ajax_tramaco_sharepoint_sync', array($this, 'ajax_sharepoint_sync'));
+        add_action('wp_ajax_tramaco_sharepoint_test_order', array($this, 'ajax_sharepoint_test_order'));
     }
     
     public function init() {
@@ -1004,14 +1005,20 @@ class Tramaco_API_Integration {
             ));
         }
         
+        error_log("Tramaco API: Generando PDF para guías: " . implode(', ', $guias));
+        
         $token = $this->get_token();
         
         if (!$token) {
+            error_log("Tramaco API: ERROR - No se pudo obtener token para generar PDF");
             wp_send_json(array(
                 'success' => false,
                 'message' => 'Error de autenticación'
             ));
         }
+        
+        error_log("Tramaco API: POST a " . TRAMACO_API_GENERAR_PDF_URL);
+        error_log("Tramaco API: Body: " . json_encode(array('guias' => (array) $guias)));
         
         $response = wp_remote_post(TRAMACO_API_GENERAR_PDF_URL, array(
             'headers' => array(
@@ -1026,16 +1033,37 @@ class Tramaco_API_Integration {
         ));
         
         if (is_wp_error($response)) {
+            error_log("Tramaco API: ERROR al generar PDF - " . $response->get_error_message());
             wp_send_json(array(
                 'success' => false,
                 'message' => $response->get_error_message()
             ));
         }
         
+        $status_code = wp_remote_retrieve_response_code($response);
+        error_log("Tramaco API: Respuesta PDF - HTTP Status: $status_code");
+        
         $body = json_decode(wp_remote_retrieve_body($response), true);
+        error_log("Tramaco API: Respuesta PDF completa: " . json_encode($body, JSON_PRETTY_PRINT));
+        
+        // Verificar si hay PDF en la respuesta
+        $codigo = null;
+        if (isset($body['cuerpoRespuesta']['codigo'])) {
+            $codigo = $body['cuerpoRespuesta']['codigo'];
+        } elseif (isset($body['codigo'])) {
+            $codigo = $body['codigo'];
+        }
+        
+        $success = ($codigo == '1' || $codigo == 1);
+        
+        if ($success) {
+            error_log("Tramaco API: ✅ PDF generado exitosamente");
+        } else {
+            error_log("Tramaco API: ❌ Error al generar PDF - Código: $codigo");
+        }
         
         wp_send_json(array(
-            'success' => isset($body['codigo']) && $body['codigo'] == 1,
+            'success' => $success,
             'data' => $body
         ));
     }
@@ -1826,6 +1854,9 @@ class Tramaco_API_Integration {
                     <button type="button" id="tramaco-sharepoint-sync" class="button button-secondary" <?php echo !$is_configured || $enabled !== '1' ? 'disabled' : ''; ?>>
                         🔄 Sincronizar Pedidos Pendientes
                     </button>
+                    <button type="button" id="tramaco-sharepoint-test-order" class="button button-secondary" <?php echo !$is_configured || $enabled !== '1' ? 'disabled' : ''; ?> style="background: #f0ad4e; color: white; border-color: #ec971f;">
+                        🧪 Pedido de Prueba
+                    </button>
                 </p>
             </form>
             
@@ -1940,6 +1971,83 @@ class Tramaco_API_Integration {
                         }
                     });
                 });
+                
+                $('#tramaco-sharepoint-test-order').on('click', function() {
+                    if (!confirm('¿Deseas crear un pedido de prueba, generar su guía y enviarla a SharePoint?\n\nEsto creará un pedido real en el sistema.')) {
+                        return;
+                    }
+                    
+                    const btn = $(this);
+                    const result = $('#tramaco-sharepoint-result');
+                    
+                    btn.prop('disabled', true).text('🧪 Generando...');
+                    result.html('<div class="notice notice-info"><p>Creando pedido de prueba, generando guía y enviando a SharePoint...</p></div>');
+                    
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'tramaco_sharepoint_test_order',
+                            nonce: '<?php echo wp_create_nonce("tramaco_sharepoint_test"); ?>'
+                        },
+                        timeout: 60000,
+                        success: function(response) {
+                            if (response.success) {
+                                let html = '<div class="notice notice-success"><p><strong>✅ ' + response.data.message + '</strong></p>';
+                                if (response.data.order_id) {
+                                    html += '<p>📦 Pedido: <a href="' + response.data.order_url + '" target="_blank">#' + response.data.order_id + '</a></p>';
+                                }
+                                if (response.data.guia) {
+                                    html += '<p><strong>📋 Guía Generada: ' + response.data.guia + '</strong></p>';
+                                }
+                                if (response.data.tracking_url) {
+                                    html += '<p>🔍 Tracking: <a href="' + response.data.tracking_url + '" target="_blank">Ver seguimiento</a></p>';
+                                }
+                                if (response.data.pdf_url) {
+                                    html += '<p>📄 PDF: <a href="' + response.data.pdf_url + '" target="_blank">Descargar</a></p>';
+                                }
+                                if (response.data.sharepoint_result) {
+                                    html += '<p>📊 SharePoint: ' + response.data.sharepoint_result + '</p>';
+                                }
+                                html += '</div>';
+                                result.html(html);
+                            } else {
+                                // Mostrar error detallado
+                                let html = '<div class="notice notice-error">';
+                                html += '<p><strong>❌ Error:</strong> ' + (response.data.message || 'Error desconocido') + '</p>';
+                                
+                                // Mostrar información adicional si existe
+                                if (response.data.order_id) {
+                                    html += '<p>📦 Pedido creado: <a href="' + response.data.order_url + '" target="_blank">#' + response.data.order_id + '</a></p>';
+                                }
+                                if (response.data.response_codigo) {
+                                    html += '<p>Código de respuesta: ' + response.data.response_codigo + '</p>';
+                                }
+                                if (response.data.response_mensaje) {
+                                    html += '<p>Mensaje API: ' + response.data.response_mensaje + '</p>';
+                                }
+                                if (response.data.guia_encontrada) {
+                                    html += '<p>Guía encontrada: ' + response.data.guia_encontrada + '</p>';
+                                }
+                                
+                                // Mostrar debug completo si está disponible (solo en modo desarrollo)
+                                if (response.data.debug_completo && console) {
+                                    console.log('Debug completo de Tramaco API:', response.data.debug_completo);
+                                    html += '<p><small>💡 Ver consola del navegador para detalles técnicos completos</small></p>';
+                                }
+                                
+                                html += '</div>';
+                                result.html(html);
+                            }
+                        },
+                        error: function() {
+                            result.html('<div class="notice notice-error"><p><strong>❌ Error al crear pedido de prueba</strong></p></div>');
+                        },
+                        complete: function() {
+                            btn.prop('disabled', false).text('🧪 Pedido de Prueba');
+                        }
+                    });
+                });
             });
             </script>
         </div>
@@ -1982,6 +2090,33 @@ class Tramaco_API_Integration {
         $handler->sync_pending_orders();
         
         wp_send_json_success(array('message' => 'Sincronización completada. Revisa los logs para más detalles.'));
+    }
+    
+    /**
+     * AJAX: Crear pedido de prueba, generar guía y enviar a SharePoint
+     */
+    public function ajax_sharepoint_test_order() {
+        check_ajax_referer('tramaco_sharepoint_test', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Permisos insuficientes'));
+            return;
+        }
+        
+        // Verificar que WooCommerce esté activo
+        if (!class_exists('WooCommerce')) {
+            wp_send_json_error(array('message' => 'WooCommerce no está activo'));
+            return;
+        }
+        
+        $handler = new Tramaco_SharePoint_Handler();
+        $result = $handler->create_test_order_and_sync();
+        
+        if ($result['success']) {
+            wp_send_json_success($result);
+        } else {
+            wp_send_json_error($result);
+        }
     }
 }
 
