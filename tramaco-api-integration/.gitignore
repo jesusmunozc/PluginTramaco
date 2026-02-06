@@ -3,8 +3,8 @@ vendor/
 node_modules/
 
 # Composer
-composer.lock
-composer.phar
+# composer.lock
+# composer.phar
 
 # WordPress
 wp-config.php

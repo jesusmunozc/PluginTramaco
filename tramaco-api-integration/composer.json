@@ -4,7 +4,7 @@
   "type": "wordpress-plugin",
   "require": {
     "php": ">=7.4",
-    "phpoffice/phpspreadsheet": "^1.29"
+    "phpoffice/phpspreadsheet": "^1.28"
   },
   "autoload": {
     "psr-4": {
