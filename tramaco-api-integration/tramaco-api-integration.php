@@ -1993,22 +1993,41 @@ class Tramaco_API_Integration {
                         timeout: 60000,
                         success: function(response) {
                             if (response.success) {
-                                let html = '<div class="notice notice-success"><p><strong>✅ ' + response.data.message + '</strong></p>';
+                                let html = '<div class="notice notice-success">';
+                                html += '<p><strong>✅ ' + response.data.message + '</strong></p>';
+                                
                                 if (response.data.order_id) {
-                                    html += '<p>📦 Pedido: <a href="' + response.data.order_url + '" target="_blank">#' + response.data.order_id + '</a></p>';
+                                    html += '<p>📦 <strong>Pedido:</strong> <a href="' + response.data.order_url + '" target="_blank">#' + response.data.order_id + '</a></p>';
                                 }
+                                
                                 if (response.data.guia) {
-                                    html += '<p><strong>📋 Guía Generada: ' + response.data.guia + '</strong></p>';
+                                    html += '<p>📋 <strong>Guía Generada:</strong> ' + response.data.guia + '</p>';
                                 }
+                                
                                 if (response.data.tracking_url) {
-                                    html += '<p>🔍 Tracking: <a href="' + response.data.tracking_url + '" target="_blank">Ver seguimiento</a></p>';
+                                    html += '<p>🔍 <strong>Tracking:</strong> <a href="' + response.data.tracking_url + '" target="_blank">Ver seguimiento en Tramaco</a></p>';
                                 }
+                                
+                                // PDF URL - sección destacada
                                 if (response.data.pdf_url) {
-                                    html += '<p>📄 PDF: <a href="' + response.data.pdf_url + '" target="_blank">Descargar</a></p>';
+                                    html += '<div style="background:#dff0d8;padding:15px;border-left:4px solid #3c763d;margin:15px 0;border-radius:4px;">';
+                                    html += '<p style="margin:0 0 10px 0;"><strong style="font-size:14px;">📄 PDF de Guía Generado</strong></p>';
+                                    html += '<p style="margin:0 0 5px 0;"><a href="' + response.data.pdf_url + '" target="_blank" style="font-weight:bold;color:#3c763d;font-size:13px;">🔗 Ver/Descargar PDF de la Guía</a></p>';
+                                    html += '<p style="margin:0;"><small style="color:#666;font-family:monospace;font-size:11px;word-break:break-all;">' + response.data.pdf_url + '</small></p>';
+                                    html += '</div>';
+                                } else {
+                                    html += '<div style="background:#fcf8e3;padding:15px;border-left:4px solid #f0ad4e;margin:15px 0;border-radius:4px;">';
+                                    html += '<p style="margin:0;"><strong>⚠️ PDF no disponible</strong><br><small>El PDF no se generó o no se guardó correctamente.</small></p>';
+                                    if (response.data.pdf_status) {
+                                        html += '<p style="margin:5px 0 0 0;"><small>Estado: ' + response.data.pdf_status + '</small></p>';
+                                    }
+                                    html += '</div>';
                                 }
+                                
                                 if (response.data.sharepoint_result) {
-                                    html += '<p>📊 SharePoint: ' + response.data.sharepoint_result + '</p>';
+                                    html += '<p>📊 <strong>SharePoint:</strong> ' + response.data.sharepoint_result + '</p>';
                                 }
+                                
                                 html += '</div>';
                                 result.html(html);
                             } else {

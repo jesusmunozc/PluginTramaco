@@ -882,6 +882,7 @@ class Tramaco_SharePoint_Handler {
             $order = wc_get_order($order_id);
             $guia_numero = $order->get_meta('_tramaco_guia_numero');
             $pdf_url = $order->get_meta('_tramaco_guia_pdf_url');
+            $pdf_path = $order->get_meta('_tramaco_guia_pdf_path');
             
             if (!$guia_numero) {
                 return array(
@@ -890,6 +891,19 @@ class Tramaco_SharePoint_Handler {
                     'order_id' => $order_id,
                     'order_url' => admin_url('post.php?post=' . $order_id . '&action=edit')
                 );
+            }
+            
+            // Verificar estado del PDF
+            $pdf_status = '';
+            if ($pdf_url && $pdf_path && file_exists($pdf_path)) {
+                $pdf_status = '✅ PDF disponible';
+                error_log("Tramaco SharePoint: ✅ PDF confirmado - URL: $pdf_url");
+            } elseif ($pdf_url) {
+                $pdf_status = '⚠️ PDF URL guardada pero archivo no encontrado';
+                error_log("Tramaco SharePoint: ⚠️ PDF URL existe pero archivo no encontrado: $pdf_path");
+            } else {
+                $pdf_status = '❌ PDF no generado';
+                error_log("Tramaco SharePoint: ❌ PDF no fue generado o guardado");
             }
             
             // 3. Enviar a SharePoint
@@ -908,13 +922,15 @@ class Tramaco_SharePoint_Handler {
                 'order_url' => admin_url('post.php?post=' . $order_id . '&action=edit'),
                 'guia' => $guia_numero,
                 'guia_message' => '📦 Guía generada: ' . $guia_numero,
-                'pdf_url' => $pdf_url,
-                'pdf_message' => $pdf_url ? '📄 PDF disponible' : '⚠️ PDF no generado',
+                'pdf_url' => $pdf_url ?: null,
+                'pdf_path' => $pdf_path ?: null,
+                'pdf_status' => $pdf_status,
+                'pdf_message' => $pdf_status,
                 'sharepoint_result' => $sharepoint_result['success'] ? '✅ Enviado a SharePoint' : '❌ Error SharePoint: ' . $sharepoint_result['message'],
                 'tracking_url' => 'https://www.tramaco.com.ec/rastreo/?guia=' . $guia_numero
             );
             
-            error_log("Tramaco SharePoint: ✅ Pedido de prueba completado - Guía: $guia_numero - " . json_encode($response));
+            error_log("Tramaco SharePoint: ✅ Pedido de prueba completado - Guía: $guia_numero - PDF: $pdf_status - Respuesta: " . json_encode($response));
             
             return $response;
             
