@@ -432,7 +432,7 @@ class Tramaco_SharePoint_Handler {
         $hora = date('H:i:s', $now);
         
         // URL del tracking de Tramaco
-        $tracking_url = 'https://www.tramaco.com.ec/rastreo/?guia=' . $guia_numero;
+        $tracking_url = 'https://www.tramaco.com.ec/rastreo.html?guia=' . $guia_numero;
         
         // URL del pedido en WooCommerce admin
         $order_admin_url = admin_url('post.php?post=' . $order->get_id() . '&action=edit');
@@ -927,7 +927,7 @@ class Tramaco_SharePoint_Handler {
                 'pdf_status' => $pdf_status,
                 'pdf_message' => $pdf_status,
                 'sharepoint_result' => $sharepoint_result['success'] ? '✅ Enviado a SharePoint' : '❌ Error SharePoint: ' . $sharepoint_result['message'],
-                'tracking_url' => 'https://www.tramaco.com.ec/rastreo/?guia=' . $guia_numero
+                'tracking_url' => 'https://www.tramaco.com.ec/rastreo.html?guia=' . $guia_numero
             );
             
             error_log("Tramaco SharePoint: ✅ Pedido de prueba completado - Guía: $guia_numero - PDF: $pdf_status - Respuesta: " . json_encode($response));

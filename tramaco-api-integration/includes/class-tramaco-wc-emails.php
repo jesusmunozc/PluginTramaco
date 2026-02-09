@@ -97,7 +97,7 @@ class Tramaco_WC_Emails {
      * Obtener contenido del email
      */
     private function get_email_content($order, $guia_numero, $pdf_url) {
-        $tracking_url = 'https://www.tramaco.com.ec/rastreo/?guia=' . $guia_numero;
+        $tracking_url = 'https://www.tramaco.com.ec/rastreo.html?guia=' . $guia_numero;
         
         ob_start();
         ?>
@@ -210,7 +210,7 @@ class Tramaco_WC_Emails {
             return;
         }
         
-        $tracking_url = 'https://www.tramaco.com.ec/rastreo/?guia=' . $guia_numero;
+        $tracking_url = 'https://www.tramaco.com.ec/rastreo.html?guia=' . $guia_numero;
         
         if ($plain_text) {
             echo "\n\n";
@@ -255,7 +255,7 @@ class Tramaco_WC_Emails {
             return;
         }
         
-        $tracking_url = 'https://www.tramaco.com.ec/rastreo/?guia=' . $guia_numero;
+        $tracking_url = 'https://www.tramaco.com.ec/rastreo.html?guia=' . $guia_numero;
         $pdf_url = $order->get_meta('_tramaco_guia_pdf_url');
         
         if (!$plain_text) {
