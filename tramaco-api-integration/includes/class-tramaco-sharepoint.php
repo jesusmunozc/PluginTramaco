@@ -769,69 +769,135 @@ class Tramaco_SharePoint_Handler {
                 error_log("Tramaco SharePoint: Generando PDF para guía $guia_numero...");
                 error_log("Tramaco SharePoint: POST a " . TRAMACO_API_GENERAR_PDF_URL);
                 
+                $pdf_data = array('guias' => array($guia_numero));
+                error_log("Tramaco SharePoint: Body enviado: " . json_encode($pdf_data));
+                
                 $pdf_response = wp_remote_post(TRAMACO_API_GENERAR_PDF_URL, array(
                     'headers' => array(
                         'Content-Type' => 'application/json',
                         'Authorization' => $token
                     ),
-                    'body' => json_encode(array('guias' => array($guia_numero))),
+                    'body' => json_encode($pdf_data),
                     'timeout' => 30,
                     'sslverify' => false
                 ));
                 
                 if (is_wp_error($pdf_response)) {
-                    error_log("Tramaco SharePoint: ERROR al generar PDF - " . $pdf_response->get_error_message());
+                    error_log("Tramaco SharePoint: ❌ ERROR al generar PDF - " . $pdf_response->get_error_message());
                 } else {
                     $pdf_status = wp_remote_retrieve_response_code($pdf_response);
                     error_log("Tramaco SharePoint: Respuesta PDF - HTTP Status: $pdf_status");
                     
-                    $pdf_body = json_decode(wp_remote_retrieve_body($pdf_response), true);
-                    error_log("Tramaco SharePoint: Respuesta PDF completa: " . json_encode($pdf_body, JSON_PRETTY_PRINT));
+                    $pdf_body_raw = wp_remote_retrieve_body($pdf_response);
+                    error_log("Tramaco SharePoint: Respuesta PDF RAW (primeros 100 chars): " . substr($pdf_body_raw, 0, 100));
                     
-                    $pdf_base64 = null;
+                    // Verificar si es PDF directo o JSON
+                    $pdf_content = null;
                     
-                    // Intentar extraer el PDF de diferentes estructuras posibles
-                    if (isset($pdf_body['salidaGenerarPdfWs']['pdf'])) {
-                        $pdf_base64 = $pdf_body['salidaGenerarPdfWs']['pdf'];
-                        error_log("Tramaco SharePoint: PDF encontrado en salidaGenerarPdfWs.pdf");
-                    } elseif (isset($pdf_body['pdf'])) {
-                        $pdf_base64 = $pdf_body['pdf'];
-                        error_log("Tramaco SharePoint: PDF encontrado en pdf");
-                    } elseif (isset($pdf_body['salidaGenerarPdfWs']['inStrPfd'])) {
-                        $pdf_base64 = $pdf_body['salidaGenerarPdfWs']['inStrPfd'];
-                        error_log("Tramaco SharePoint: PDF encontrado en salidaGenerarPdfWs.inStrPfd");
-                    } elseif (isset($pdf_body['inStrPfd'])) {
-                        $pdf_base64 = $pdf_body['inStrPfd'];
-                        error_log("Tramaco SharePoint: PDF encontrado en inStrPfd");
+                    if (substr($pdf_body_raw, 0, 4) === '%PDF') {
+                        // Es un PDF directo
+                        error_log("Tramaco SharePoint: ✅ PDF directo detectado (no JSON)");
+                        $pdf_content = $pdf_body_raw;
                     } else {
-                        error_log("Tramaco SharePoint: ⚠️ PDF no encontrado en la respuesta");
+                        // Intentar parsear como JSON
+                        error_log("Tramaco SharePoint: Intentando parsear como JSON...");
+                        $pdf_body = json_decode($pdf_body_raw, true);
+                        
+                        if (json_last_error() !== JSON_ERROR_NONE) {
+                            error_log("Tramaco SharePoint: ❌ ERROR al decodificar JSON: " . json_last_error_msg());
+                        } elseif (is_array($pdf_body)) {
+                            error_log("Tramaco SharePoint: Respuesta JSON parseada exitosamente");
+                            
+                            // Verificar código de respuesta
+                            $pdf_codigo = null;
+                            if (isset($pdf_body['cuerpoRespuesta']['codigo'])) {
+                                $pdf_codigo = $pdf_body['cuerpoRespuesta']['codigo'];
+                            } elseif (isset($pdf_body['codigo'])) {
+                                $pdf_codigo = $pdf_body['codigo'];
+                            }
+                            
+                            error_log("Tramaco SharePoint: Código de respuesta: " . ($pdf_codigo ?: 'NO ENCONTRADO'));
+                            
+                            // Intentar extraer el PDF en base64 de diferentes estructuras posibles
+                            $pdf_base64 = null;
+                            if (isset($pdf_body['salidaGenerarPdfWs']['inStrPfd'])) {
+                                $pdf_base64 = $pdf_body['salidaGenerarPdfWs']['inStrPfd'];
+                                error_log("Tramaco SharePoint: ✅ PDF base64 encontrado en salidaGenerarPdfWs.inStrPfd");
+                            } elseif (isset($pdf_body['salidaGenerarPdfWs']['pdf'])) {
+                                $pdf_base64 = $pdf_body['salidaGenerarPdfWs']['pdf'];
+                                error_log("Tramaco SharePoint: ✅ PDF base64 encontrado en salidaGenerarPdfWs.pdf");
+                            } elseif (isset($pdf_body['inStrPfd'])) {
+                                $pdf_base64 = $pdf_body['inStrPfd'];
+                                error_log("Tramaco SharePoint: ✅ PDF base64 encontrado en inStrPfd");
+                            } elseif (isset($pdf_body['pdf'])) {
+                                $pdf_base64 = $pdf_body['pdf'];
+                                error_log("Tramaco SharePoint: ✅ PDF base64 encontrado en pdf");
+                            } else {
+                                error_log("Tramaco SharePoint: ⚠️ PDF no encontrado en ninguna ubicación conocida de JSON");
+                                if (is_array($pdf_body)) {
+                                    error_log("Tramaco SharePoint: Estructura de respuesta: " . json_encode(array_keys($pdf_body)));
+                                }
+                            }
+                            
+                            if ($pdf_base64) {
+                                error_log("Tramaco SharePoint: Decodificando base64 - Tamaño: " . strlen($pdf_base64) . " caracteres");
+                                $pdf_content = base64_decode($pdf_base64);
+                            }
+                        }
                     }
                     
-                    if ($pdf_base64) {
-                        error_log("Tramaco SharePoint: Decodificando PDF - Tamaño base64: " . strlen($pdf_base64) . " caracteres");
-                        $pdf_content = base64_decode($pdf_base64);
+                    // Si tenemos contenido PDF (directo o decodificado), guardarlo
+                    if ($pdf_content) {
+                        $pdf_size = strlen($pdf_content);
+                        error_log("Tramaco SharePoint: 📦 PDF disponible - Tamaño: " . ($pdf_size / 1024) . " KB");
+                        
+                        // Verificar que sea un PDF válido (debe empezar con %PDF)
+                        if (substr($pdf_content, 0, 4) === '%PDF') {
+                            error_log("Tramaco SharePoint: ✅ PDF válido detectado (header correcto)");
+                        } else {
+                            $header = substr($pdf_content, 0, 20);
+                            error_log("Tramaco SharePoint: ⚠️ No es un PDF válido. Header: " . bin2hex($header));
+                        }
                         
                         // Crear directorio si no existe
                         $upload_dir = wp_upload_dir();
                         $tramaco_dir = $upload_dir['basedir'] . '/tramaco-guias/' . date('Y') . '/' . date('m');
                         
+                        error_log("Tramaco SharePoint: Directorio destino: $tramaco_dir");
+                        
                         if (!file_exists($tramaco_dir)) {
-                            wp_mkdir_p($tramaco_dir);
+                            $mkdir_result = wp_mkdir_p($tramaco_dir);
+                            if ($mkdir_result) {
+                                error_log("Tramaco SharePoint: ✅ Directorio creado exitosamente");
+                            } else {
+                                error_log("Tramaco SharePoint: ❌ ERROR al crear directorio");
+                            }
+                        } else {
+                            error_log("Tramaco SharePoint: ℹ️ Directorio ya existe");
                         }
                         
                         // Guardar archivo
                         $filename = 'guia-' . $guia_numero . '-order-' . $order_id . '.pdf';
                         $filepath = $tramaco_dir . '/' . $filename;
                         
-                        $pdf_size = strlen($pdf_content);
-                        error_log("Tramaco SharePoint: Guardando PDF - Tamaño: " . ($pdf_size / 1024) . " KB");
+                        error_log("Tramaco SharePoint: Guardando PDF en: $filepath");
                         
-                        file_put_contents($filepath, $pdf_content);
+                        $bytes_written = file_put_contents($filepath, $pdf_content);
+                        
+                        if ($bytes_written !== false) {
+                            error_log("Tramaco SharePoint: ✅ Archivo escrito - $bytes_written bytes");
+                        } else {
+                            error_log("Tramaco SharePoint: ❌ ERROR al escribir archivo");
+                        }
                         
                         // Verificar que el archivo se guardó correctamente
                         if (file_exists($filepath)) {
                             $file_size_kb = filesize($filepath) / 1024;
-                            error_log("Tramaco SharePoint: ✅ PDF verificado - Tamaño en disco: {$file_size_kb} KB");
+                            error_log("Tramaco SharePoint: ✅ PDF verificado en disco - Tamaño: {$file_size_kb} KB");
+                            
+                            // Verificar permisos
+                            $perms = substr(sprintf('%o', fileperms($filepath)), -4);
+                            error_log("Tramaco SharePoint: Permisos del archivo: $perms");
                             
                             // URL del archivo
                             $pdf_url = $upload_dir['baseurl'] . '/tramaco-guias/' . date('Y') . '/' . date('m') . '/' . $filename;
@@ -839,12 +905,19 @@ class Tramaco_SharePoint_Handler {
                             $order->update_meta_data('_tramaco_guia_pdf_url', $pdf_url);
                             $order->update_meta_data('_tramaco_guia_pdf_path', $filepath);
                             
-                            error_log("Tramaco SharePoint: ✅ PDF accesible en: $pdf_url");
+                            error_log("Tramaco SharePoint: ✅ PDF guardado y accesible en: $pdf_url");
                         } else {
-                            error_log("Tramaco SharePoint: ❌ ERROR - El PDF no se guardó correctamente en $filepath");
+                            error_log("Tramaco SharePoint: ❌ ERROR - El archivo NO existe después de escribirlo: $filepath");
+                            
+                            // Debug adicional
+                            if (is_writable(dirname($filepath))) {
+                                error_log("Tramaco SharePoint: ℹ️ El directorio SÍ es escribible");
+                            } else {
+                                error_log("Tramaco SharePoint: ❌ El directorio NO es escribible");
+                            }
                         }
                     } else {
-                        error_log("Tramaco SharePoint: ⚠️ No se generó PDF - base64 vacío o nulo");
+                        error_log("Tramaco SharePoint: ⚠️ No se obtuvo contenido PDF (ni directo ni base64)");
                     }
                 }
                 
