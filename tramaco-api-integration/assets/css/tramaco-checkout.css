@@ -260,7 +260,9 @@
   border-radius: 16px;
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.03);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.04),
+    0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
 .tramaco-cart-location-selector h3 {
@@ -273,9 +275,10 @@
   gap: 8px;
 }
 
-.tramaco-cart-location-selector h3::before {
-  content: '📍';
+/* Icono ya incluido en el HTML, no se necesita ::before */
+.tramaco-cart-location-selector h3 .location-icon {
   font-size: 18px;
+  line-height: 1;
 }
 
 .tramaco-cart-location-selector .description {

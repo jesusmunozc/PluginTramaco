@@ -501,6 +501,29 @@ class Tramaco_WooCommerce_Integration {
             (function() {
                 console.log('Tramaco Blocks: Script de inyección cargando...');
                 
+                // Definir tramacoCartData para WooCommerce Blocks
+                if (typeof tramacoCartData === 'undefined') {
+                    window.tramacoCartData = {
+                        ubicaciones: <?php echo json_encode($ubicaciones); ?>,
+                        savedProvincia: '<?php echo esc_js($saved_provincia); ?>',
+                        savedCanton: '<?php echo esc_js($saved_canton); ?>',
+                        savedParroquia: '<?php echo esc_js($saved_parroquia); ?>',
+                        savedShippingCost: <?php echo $saved_shipping_cost ? floatval($saved_shipping_cost) : 'null'; ?>,
+                        shippingApplied: <?php echo ($saved_parroquia && $saved_shipping_cost) ? 'true' : 'false'; ?>,
+                        ajaxUrl: '<?php echo admin_url('admin-ajax.php'); ?>',
+                        nonce: '<?php echo wp_create_nonce('tramaco_api_nonce'); ?>',
+                        i18n: {
+                            selectProvincia: '<?php echo esc_js(__('Seleccione una provincia...', 'tramaco-api')); ?>',
+                            selectCanton: '<?php echo esc_js(__('Seleccione un cantón...', 'tramaco-api')); ?>',
+                            selectParroquia: '<?php echo esc_js(__('Seleccione una parroquia...', 'tramaco-api')); ?>',
+                            calculating: '<?php echo esc_js(__('Calculando...', 'tramaco-api')); ?>',
+                            error: '<?php echo esc_js(__('Error al calcular el envío', 'tramaco-api')); ?>',
+                            firstSelectProvince: '<?php echo esc_js(__('Primero seleccione provincia', 'tramaco-api')); ?>',
+                            firstSelectCanton: '<?php echo esc_js(__('Primero seleccione cantón', 'tramaco-api')); ?>'
+                        }
+                    };
+                }
+                
                 // HTML del selector
                 var selectorHTML = '<div class="tramaco-cart-location-selector" id="tramaco-cart-location">' +
                     '<h3>📍 <?php echo esc_js(__('Calcular costo de envío', 'tramaco-api')); ?></h3>' +
@@ -529,14 +552,27 @@ class Tramaco_WooCommerce_Integration {
                         '<div class="tramaco-shipping-calculated">' +
                             '<span class="tramaco-shipping-icon">🚚</span>' +
                             '<span class="tramaco-shipping-label"><?php echo esc_js(__('Costo de envío Tramaco:', 'tramaco-api')); ?></span>' +
-                            '<span class="tramaco-shipping-price" id="tramaco-shipping-price"></span>' +
+                            '<span class="tramaco-shipping-price" id="tramaco-shipping-price"><?php echo ($saved_shipping_cost && $saved_parroquia) ? wp_strip_all_tags(wc_price($saved_shipping_cost)) : ''; ?></span>' +
                         '</div>' +
                     '</div>' +
                     '<div class="tramaco-cart-calculating" id="tramaco-calculating" style="display:none;">' +
                         '<span class="spinner"></span><?php echo esc_js(__('Calculando costo de envío...', 'tramaco-api')); ?>' +
                     '</div>' +
+                    '<div class="tramaco-applying-overlay" id="tramaco-applying-overlay" style="display:none;">' +
+                        '<div class="applying-content">' +
+                            '<div class="applying-spinner"></div>' +
+                            '<span class="applying-text"><?php echo esc_js(__('Aplicando envío al carrito...', 'tramaco-api')); ?></span>' +
+                        '</div>' +
+                    '</div>' +
                     '<div class="tramaco-cart-error" id="tramaco-cart-error" style="display:none;"></div>' +
-                    '<div class="tramaco-cart-warning" id="tramaco-cart-warning">' +
+                    '<div class="tramaco-location-confirmed" id="tramaco-location-confirmed" <?php echo ($saved_parroquia && $saved_shipping_cost) ? '' : 'style="display:none;"'; ?>>' +
+                        '<span class="check-icon">✅</span>' +
+                        '<div class="confirmed-text">' +
+                            '<strong><?php echo esc_js(__('¡Envío aplicado correctamente!', 'tramaco-api')); ?></strong>' +
+                            '<span><?php echo esc_js(__('Puedes proceder al pago o modificar tu ubicación si lo necesitas.', 'tramaco-api')); ?></span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="tramaco-cart-warning" id="tramaco-cart-warning" <?php echo ($saved_parroquia && $saved_shipping_cost) ? 'style="display:none;"' : ''; ?>>' +
                         '<span class="warning-icon">⚠️</span>' +
                         '<?php echo esc_js(__('Debes seleccionar tu ubicación para calcular el envío antes de continuar al checkout.', 'tramaco-api')); ?>' +
                     '</div>' +
@@ -678,9 +714,9 @@ class Tramaco_WooCommerce_Integration {
                 </div>
             </div>
             
-            <!-- Resultado del cálculo -->
-            <div class="tramaco-cart-shipping-result" id="tramaco-shipping-result" style="<?php echo $saved_shipping_cost ? '' : 'display:none;'; ?>">
-                <?php if ($saved_shipping_cost): ?>
+            <!-- Resultado del cálculo (siempre oculto - solo mostrar mensaje de confirmación) -->
+            <div class="tramaco-cart-shipping-result" id="tramaco-shipping-result" style="display:none;">
+                <?php if ($saved_shipping_cost && $saved_parroquia): ?>
                     <div class="tramaco-shipping-calculated">
                         <span class="tramaco-shipping-icon">🚚</span>
                         <span class="tramaco-shipping-label"><?php _e('Costo de envío Tramaco:', 'tramaco-api'); ?></span>
@@ -701,6 +737,14 @@ class Tramaco_WooCommerce_Integration {
             <div class="tramaco-cart-calculating" id="tramaco-calculating" style="display:none;">
                 <span class="spinner"></span>
                 <?php _e('Calculando costo de envío...', 'tramaco-api'); ?>
+            </div>
+            
+            <!-- Overlay de aplicando envío (mientras se actualiza la página) -->
+            <div class="tramaco-applying-overlay" id="tramaco-applying-overlay" style="display:none;">
+                <div class="applying-content">
+                    <div class="applying-spinner"></div>
+                    <span class="applying-text"><?php _e('Aplicando envío al carrito...', 'tramaco-api'); ?></span>
+                </div>
             </div>
             
             <!-- Mensaje de error -->
@@ -729,6 +773,8 @@ class Tramaco_WooCommerce_Integration {
                 savedProvincia: '<?php echo esc_js($saved_provincia); ?>',
                 savedCanton: '<?php echo esc_js($saved_canton); ?>',
                 savedParroquia: '<?php echo esc_js($saved_parroquia); ?>',
+                savedShippingCost: <?php echo $saved_shipping_cost ? floatval($saved_shipping_cost) : 'null'; ?>,
+                shippingApplied: <?php echo ($saved_parroquia && $saved_shipping_cost) ? 'true' : 'false'; ?>,
                 ajaxUrl: '<?php echo admin_url('admin-ajax.php'); ?>',
                 nonce: '<?php echo wp_create_nonce('tramaco_api_nonce'); ?>',
                 i18n: {
@@ -842,6 +888,12 @@ class Tramaco_WooCommerce_Integration {
         WC()->session->set('tramaco_cart_provincia', $provincia);
         WC()->session->set('tramaco_cart_canton', $canton);
         WC()->session->set('tramaco_cart_parroquia', $parroquia);
+        
+        // Si no hay parroquia, limpiar el costo de envío calculado
+        // para evitar mostrar costos de ubicaciones anteriores
+        if (!$parroquia) {
+            WC()->session->set('tramaco_calculated_shipping', null);
+        }
         
         // También guardar para el método de envío
         if ($parroquia) {
